@@ -52,11 +52,15 @@ if exist "node.exe" (
   start "Karaoke do Bulla - servidor" cmd /k "node server.js"
 )
 
-rem --- 3) Abre a pagina do host ---
+rem --- 3) Abre a pagina do host e a tela do hotspot do Windows ---
 timeout /t 3 /nobreak >nul
 start "" "http://localhost:8080/host.html"
+start ms-settings:network-mobilehotspot
 echo.
 echo  Servidor rodando na janela "Karaoke do Bulla - servidor".
 echo  Para PARAR o app: feche aquela janela. A fila nao se perde.
 echo  Pode fechar ESTA janela.
-timeout /t 3 /nobreak >nul
+echo  A tela "Ponto de acesso movel" do Windows abriu tambem:
+echo  ligue o hotspot NELA e use o MESMO nome e senha definidos
+echo  no painel do host (box "Wi-Fi da festa").
+timeout /t 3 /nobreak > nul
