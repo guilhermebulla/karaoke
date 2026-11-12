@@ -27,6 +27,7 @@ const HIST_MAX = 50;           // performances guardadas no histórico
 const MAX_ACTIVE = 3;          // máx. de pedidos ativos por pessoa
 const MAX_NAME = 40;           // máx. de caracteres no nome do convidado
 const MAX_EVENT = 40;          // máx. de caracteres no nome do karaokê
+const MAX_WIFI = 32;           // máx. de caracteres no nome e na senha do Wi-Fi
 
 /* ------------------------- UTILITÁRIOS ----------------------- */
 function norm(s) {
@@ -172,7 +173,9 @@ let state = {
   current: null,   // quem está cantando agora
   fila: [],        // pedidos aguardando (em ordem de exibição)
   hist: [],        // últimas performances
-  eventName: 'Karaokê do Bulla' // nome exibido em todas as telas
+  eventName: 'Karaokê do Bulla', // nome exibido em todas as telas
+  wifiName: '',    // nome do Wi-Fi da festa (exibido na TV)
+  wifiPass: ''     // senha do Wi-Fi da festa (exibida na TV)
 };
 let perfCounts = {};          // nome normalizado -> nº de vezes ao microfone
 let itemSeq = 0;              // gerador de ids dos pedidos
@@ -201,6 +204,8 @@ function loadState() {
       state.rodizio = !!d.state.rodizio;
       state.eventName = (typeof d.state.eventName === 'string' && d.state.eventName.trim())
         ? d.state.eventName : state.eventName;
+      state.wifiName = (typeof d.state.wifiName === 'string') ? d.state.wifiName : state.wifiName;
+      state.wifiPass = (typeof d.state.wifiPass === 'string') ? d.state.wifiPass : state.wifiPass;
       state.current = d.state.current || null;
       state.fila = Array.isArray(d.state.fila) ? d.state.fila : [];
       state.hist = Array.isArray(d.state.hist) ? d.state.hist : [];
@@ -223,6 +228,8 @@ function snapshot() {
     open: state.open,
     rodizio: state.rodizio,
     eventName: state.eventName,
+    wifiName: state.wifiName,
+    wifiPass: state.wifiPass,
     current: state.current,
     fila: state.fila,
     hist: state.hist.slice(-HIST_MAX)
@@ -338,6 +345,14 @@ function adminAction(b) {
       const nm = sanitizeText(b.value, MAX_EVENT);
       if (!nm) return { ok: false, msg: 'Digite um nome para o karaokê.' };
       state.eventName = nm;
+      break;
+    }
+    case 'wifi': {
+      const nm = sanitizeText(b.value, MAX_WIFI);
+      const pw = sanitizeText(b.pass, MAX_WIFI);
+      if (!nm && !pw) return { ok: false, msg: 'Preencha nome e senha do Wi-Fi.' };
+      if (nm) state.wifiName = nm;
+      if (pw) state.wifiPass = pw;
       break;
     }
     case 'rodizio':
