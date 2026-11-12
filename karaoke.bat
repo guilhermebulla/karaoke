@@ -1,33 +1,56 @@
 @echo off
 rem ============================================================
-rem  KARAOKE DO BULLA - INICIALIZADOR (duplo clique)
-rem  1) Confere se o Node esta instalado
-rem  2) Sobe o servidor em janela propria
-rem  3) Abre a pagina do host no navegador
-rem  Pasta do projeto (edite aqui se mudar de lugar):
+rem  KARAOKE DO BULLA - INICIALIZADOR v2 (kit portatil)
+rem  1) Trabalha na pasta onde ESTE bat estiver (sem caminho fixo)
+rem  2) Prefere o Node que vem DENTRO do kit (pasta node)
+rem  3) Se nao achar, usa o Node instalado no sistema
+rem  4) Sobe o servidor e abre a pagina do host
 rem ============================================================
-cd /d C:\karaoke
+title Karaoke do Bulla - inicializador
 
-where node >nul 2>nul
-if errorlevel 1 (
-  echo.
-  echo  [ERRO] Node.js nao encontrado neste computador.
-  echo  Instale a versao LTS em: https://nodejs.org
-  echo  Depois clique de novo em iniciar-karaoke.bat
-  echo.
-  pause
-  exit /b 1
-)
+rem --- 0) Pasta do kit: muda para onde este arquivo esta ---
+cd /d "%~dp0"
 
+rem --- 1) Conferencias do kit ---
 if not exist server.js (
   echo.
-  echo  [ERRO] server.js nao encontrado em C:\karaoke
+  echo  [ERRO] server.js nao encontrado nesta pasta:
+  echo         %cd%
+  echo  O kit deve ter: server.js, repertorio.json e a pasta public.
   echo.
   pause
   exit /b 1
 )
 
-start "Karaoke do Bulla - servidor" cmd /k "node server.js"
+if not exist repertorio.json (
+  echo.
+  echo  [AVISO] repertorio.json nao encontrado nesta pasta.
+  echo  O app vai subir com 0 musicas. Copie o repertorio.json do
+  echo  repositorio para a pasta do kit e reinicie.
+  echo.
+  pause
+)
+
+rem --- 2) Node: primeiro o do kit, depois o do sistema ---
+if exist "node\node.exe" (
+  start "Karaoke do Bulla - servidor" cmd /k "node\node.exe server.js"
+) else (
+  where node >nul 2>nul
+  if errorlevel 1 (
+    echo.
+    echo  [ERRO] Node nao encontrado: nem a pasta node do kit,
+    echo  nem o Node instalado neste PC.
+    echo  Como resolver:
+    echo   1. Copie a pasta "node" do kit original para dentro da pasta do kit.
+    echo   2. Ou instale a versao LTS em https://nodejs.org - uma vez so.
+    echo.
+    pause
+    exit /b 1
+  )
+  start "Karaoke do Bulla - servidor" cmd /k "node server.js"
+)
+
+rem --- 3) Abre a pagina do host ---
 timeout /t 3 /nobreak >nul
 start "" "http://localhost:8080/host.html"
 echo.
