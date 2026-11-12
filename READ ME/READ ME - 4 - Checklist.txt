@@ -11,7 +11,7 @@ ETAPA 1 - ENSAIO EM CASA (1 a 2 dias antes)
 ------------------------------------------------------------------
 [ ] Estrutura conferida: C:\karaoke\ com server.js e
     repertorio.json na raiz + pasta public\ com os 3 HTML.
-[ ] Servidor roda: no terminal, cd C:\karaoke e node server.js.
+[ ] Servidor roda: duplo clique no karaoke.bat.
 [ ] Console mostra "[CATALOGO] N musica(s) carregada(s)" com
     N maior que zero e igual ao seu repertório.
 [ ] Notebook ligado na tomada durante o ensaio.
@@ -71,7 +71,8 @@ ETAPA 4 - MONTAGEM NO LOCAL (30 a 60 min antes)
     suspender" na tomada) - notebook dormindo = festa sem app.
 [ ] Hotspot do Windows: desativar o desligamento automático
     quando não houver dispositivos conectados.
-[ ] Terminal aberto: cd C:\karaoke e node server.js.
+[ ] Janela do servidor aberta: duplo clique no karaoke.bat
+    (janela "Karaoke do Bulla - servidor").
 [ ] Comparar o IP do console com o do QR impresso. Mudou?
     Refazer o QR ou escrever o endereço novo à mão no card.
 [ ] Painel do artista aberto e logado.
@@ -86,7 +87,7 @@ ETAPA 4 - MONTAGEM NO LOCAL (30 a 60 min antes)
 ------------------------------------------------------------------
 ETAPA 5 - DURANTE A FESTA
 ------------------------------------------------------------------
-- Janela do terminal ABERTA e intocada - ela É o servidor.
+- Janela do servidor ABERTA e intocada - ela É o servidor.
 - Não desligar o hotspot nem fechar o navegador da TV.
 - TV reiniciou ou a página fechou? Reabrir o endereço: a fila
   continua lá (fica salva em fila.json).

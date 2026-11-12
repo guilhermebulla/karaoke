@@ -17,17 +17,23 @@ Página abre, fila não atualiza ......... Sintoma 6
 Os sintomas 2 e 3 resolvem a maioria das falhas na 1a execução.
 
 ------------------------------------------------------------------
-SINTOMA 1 - "'node' não é reconhecido como um comando interno ou
-externo..." (aparece no terminal)
+SINTOMA 1 - O karaoke.bat mostra "[ERRO] Node nao encontrado: nem
+o node.exe do kit, nem o Node instalado neste PC." OU (só se você
+rodar node server.js à mão no terminal) "'node' não é reconhecido
+como um comando interno ou externo..."
 ------------------------------------------------------------------
 CAUSA
-Node.js não está instalado, ou o terminal foi aberto ANTES da
-instalação — o Windows só recarrega o PATH em terminal novo.
+A pasta do kit está sem o node.exe e o computador não tem o Node
+instalado — ou o terminal foi aberto ANTES da instalação (o Windows
+só recarrega o PATH em terminal novo).
 
 AÇÃO
-1. Instale a versão LTS em https://nodejs.org (Next, Next, Finish).
-2. FECHE o terminal e abra um novo.
-3. Confirme: node --version deve responder algo como v22.x.x.
+1. Copie o node.exe do kit ORIGINAL para a raiz da pasta do kit.
+2. Alternativa (uma vez por computador): instale a versão LTS em
+   https://nodejs.org (Next, Next, Finish).
+3. Se instalou, FECHE o terminal e abra um novo, e confirme:
+   node --version deve responder algo como v22.x.x.
+4. Duplo clique de novo no karaoke.bat.
 
 ------------------------------------------------------------------
 SINTOMA 2 - O server.js "não roda" e o ícone aparece como
