@@ -41,6 +41,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .poster.show{display:flex}
 .poster canvas{height:42vh;width:auto;max-width:56vw;border-radius:10px;box-shadow:0 0 40px rgba(212,168,83,.15)}
 .poster-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.5rem,3.4vw,2.8rem);color:var(--gold);margin-top:2vh}
+.poster-wifi{font-size:clamp(1rem,2.4vw,1.9rem);color:var(--tx);margin-bottom:2.4vh;background:var(--gold-soft);border:1px solid var(--gold);border-radius:50px;padding:1.2vh 2.2vw}
+.poster-wifi b{color:var(--gold);font-weight:700;word-break:break-word}
 .foot{flex:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:1.4vh 0;border-top:1px solid var(--bd);font-size:clamp(.8rem,1.4vw,1.05rem);color:var(--mut);margin-top:1.4vh}
 .foot b{color:var(--gold);font-weight:600}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);margin-right:6px}
@@ -78,25 +80,23 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 </section>
 <section class="poster" id="poster">
   <div class="eyebrow">🎤 Palco livre</div>
+  <div class="poster-wifi" id="posterWifi" hidden>📶 Conecte no Wi-Fi <b id="pWifiName"></b><span id="pPassPart" hidden> · 🔑 <b id="pWifiPass"></b></span></div>
   <div id="qrBig"></div>
   <div class="qr-fail" id="qrFailB" hidden>Wi-Fi sem IP — ligue o hotspot do notebook</div>
   <div class="poster-title">Aponte a câmera e seja a estrela!</div>
 </section>
 <footer class="foot">
-  <span>📶 Wi-Fi: <b id="wifiName">…</b></span>
-  <span><span class="dot off" id="dot"></span><b id="urlTv">…</b></span>
+  <span id="wifiInfo" hidden>📶 Wi-Fi: <b id="wifiName">…</b><span id="passPart" hidden> · 🔑 <b id="wifiPass"></b></span></span>
+  <span id="wifiOff">📶 Wi-Fi da festa: configure no painel do host</span>
+  <span><span class="dot off" id="dot"></span></span>
 </footer>
 <div class="hint" id="hint">👆 Toque na tela para tela cheia</div>
 <script>
 'use strict';
-/* ===== AJUSTE AQUI (aparece no rodapé do telão) ===== */
-const WIFI_NAME = '[PREENCHER NOME DO WI-FI]';
-const TV_URL    = 'http://192.168.137.1:8080'; // confira com o IP impresso no console do servidor
-/* ===================================================== */
+/* ===== Wi-Fi da festa: nome e senha agora chegam do painel do host, em tempo real ===== */
 const $=(id)=>document.getElementById(id);
 const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-$('wifiName').textContent=WIFI_NAME;
-$('urlTv').textContent=TV_URL;
+/* Rodapé e pôster são pintados por paintWifi() a cada atualização */
 let state={current:null,fila:[]};
 /* Respiro simétrico: espaçamento de baixo da lista = o de cima; QR acompanha a altura do box.
    O QR é zerado ANTES da medição — senão ele sustenta a altura do box e nada muda. */
@@ -211,7 +211,21 @@ function loadHost(){
     }
   }).catch(()=>{$('qrFailS').hidden=false;$('qrFailB').hidden=false;});
 }
+function paintWifi(){
+  const nm=(state.wifiName||'').trim();
+  const pw=(state.wifiPass||'').trim();
+  $('wifiInfo').hidden=!nm;
+  $('passPart').hidden=!pw;
+  if(nm)$('wifiName').textContent=nm;
+  if(pw)$('wifiPass').textContent=pw;
+  $('wifiOff').hidden=!!(nm||pw);
+  $('posterWifi').hidden=!nm;
+  $('pPassPart').hidden=!pw;
+  if(nm)$('pWifiName').textContent=nm;
+  if(pw)$('pWifiPass').textContent=pw;
+}
 function render(){
+  paintWifi();
   const n=state.eventName||'Karaokê do Bulla';
   const i=n.indexOf(' ');
   $('tvLogo').innerHTML=esc(i>0?n.slice(0,i):n)+(i>0?' <span>'+esc(n.slice(i+1))+'</span>':'');
