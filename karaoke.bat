@@ -31,17 +31,19 @@ if not exist repertorio.json (
   pause
 )
 
-rem --- 2) Node: primeiro o do kit, depois o do sistema ---
-if exist "node\node.exe" (
+rem --- 2) Node: primeiro o do kit (raiz ou pasta node), depois o do sistema ---
+if exist "node.exe" (
+  start "Karaoke do Bulla - servidor" cmd /k "node.exe server.js"
+) else if exist "node\node.exe" (
   start "Karaoke do Bulla - servidor" cmd /k "node\node.exe server.js"
 ) else (
   where node >nul 2>nul
   if errorlevel 1 (
     echo.
-    echo  [ERRO] Node nao encontrado: nem a pasta node do kit,
+    echo  [ERRO] Node nao encontrado: nem o node.exe do kit,
     echo  nem o Node instalado neste PC.
     echo  Como resolver:
-    echo   1. Copie a pasta "node" do kit original para dentro da pasta do kit.
+    echo   1. Copie o node.exe do kit original para a raiz da pasta do kit.
     echo   2. Ou instale a versao LTS em https://nodejs.org - uma vez so.
     echo.
     pause
