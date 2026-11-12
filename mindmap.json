@@ -1,0 +1,108 @@
+{
+  "colorOverridesByNodeId": {},
+  "mindmap": {
+    "version": "1",
+    "title": "Projeto Karaokê do Bulla",
+    "layoutMode": "distributed",
+    "tree": {
+      "id": "root",
+      "label": "Karaokê do Bulla",
+      "children": [
+        {
+          "id": "frontend",
+          "label": "Interfaces (Frontend)",
+          "children": [
+            {
+              "id": "index",
+              "label": "index.html (Convidado)"
+            },
+            {
+              "id": "admin",
+              "label": "admin.html (Artista)"
+            },
+            {
+              "id": "tv",
+              "label": "tv.html (Telão)"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "Servidor (server.js)",
+          "children": [
+            {
+              "id": "tech",
+              "label": "Tecnologias (Node puro, SSE)"
+            },
+            {
+              "id": "data",
+              "label": "Arquivos de Dados (fila.json, repertorio.json)"
+            }
+          ]
+        },
+        {
+          "id": "api",
+          "label": "Endpoints da API",
+          "children": [
+            {
+              "id": "api-state",
+              "label": "/state"
+            },
+            {
+              "id": "api-events",
+              "label": "/events"
+            },
+            {
+              "id": "api-req",
+              "label": "/api/req"
+            },
+            {
+              "id": "api-admin",
+              "label": "/api/admin"
+            }
+          ]
+        },
+        {
+          "id": "rules",
+          "label": "Regras de Negócio",
+          "children": [
+            {
+              "id": "rodizio",
+              "label": "Sistema de rodízio"
+            },
+            {
+              "id": "limit",
+              "label": "Máximo de 3 pedidos por pessoa"
+            },
+            {
+              "id": "states",
+              "label": "Gerenciamento de estados"
+            }
+          ]
+        },
+        {
+          "id": "docs",
+          "label": "Documentação (READMEs)",
+          "children": [
+            {
+              "id": "doc-1",
+              "label": "1-Instalacao"
+            },
+            {
+              "id": "doc-2",
+              "label": "2-Teste-Guiado"
+            },
+            {
+              "id": "doc-3",
+              "label": "3-Troubleshooting"
+            },
+            {
+              "id": "doc-4",
+              "label": "4-Checklist-Festa"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

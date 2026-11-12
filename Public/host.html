@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karaokê do Bulla — Host</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f0f0f'/%3E%3Ctext x='16' y='23' font-family='serif' font-size='20' font-weight='700' fill='%23d4a853' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f0f;--card:#1a1a1a;--elev:#171717;--gold:#d4a853;--gold-h:#b88d3e;--gold-soft:rgba(212,168,83,.12);--tx:#f5f5f5;--mut:#a3a3a3;--dim:#666;--bd:#2a2a2a;--bd2:#3a3a3a;--grn:#5aa86c;--rd:#c0554f}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 60px}
+.top{position:sticky;top:0;z-index:20;background:rgba(15,15,15,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:Georgia,'Times New Roman',serif;font-size:1.2rem;font-weight:700;color:var(--gold);letter-spacing:-.5px}
+.logo span{color:var(--tx);font-weight:400}
+.badge{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--mut)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--grn)}
+.dot.off{background:var(--rd)}
+.srv{background:linear-gradient(135deg,var(--card),var(--elev));border:1px solid var(--gold);border-radius:14px;padding:18px;margin:16px 0;box-shadow:0 0 24px rgba(212,168,83,.08)}
+.srv-label{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.srv-title{font-family:Georgia,serif;font-size:1.3rem;font-weight:700;color:var(--gold)}
+.srv-sub{font-size:.9rem;color:var(--mut);margin-top:2px}
+.addr{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:16px}
+.addr-title{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.addr-url{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.addr-url b{font-size:clamp(1.1rem,4.5vw,1.45rem);font-weight:600;word-break:break-all}
+.addr-url input{flex:1;min-width:0;padding:10px 14px;font-size:16px;background:var(--bg);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);outline:none;transition:border-color .2s}
+.addr-url input:focus{border-color:var(--gold)}
+.btn-mini{border:1px solid var(--bd2);background:var(--elev);color:var(--mut);border-radius:50px;padding:8px 14px;font-size:.8rem;cursor:pointer;transition:all .2s;flex:none}
+.btn-mini:hover{border-color:var(--gold);color:var(--gold)}
+.addr-warn{display:none;margin-top:10px;font-size:.85rem;color:var(--rd)}
+.addr-warn.show{display:block}
+.addr-others{margin-top:8px;font-size:.78rem;color:var(--dim);word-break:break-all}
+.screens{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:6px}
+.scr{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;transition:all .2s;user-select:none}
+.scr:hover{border-color:var(--gold);background:var(--gold-soft)}
+.scr-ico{font-size:1.6rem}
+.scr-name{font-size:.92rem;font-weight:600;margin-top:6px}
+.scr-sub{font-size:.72rem;color:var(--dim);margin-top:2px}
+.screens-note{font-size:.72rem;color:var(--dim);text-align:center}
+.help{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin-top:16px}
+.help-title{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.help-list li{list-style:none;display:flex;gap:8px;font-size:.88rem;color:var(--mut);padding:4px 0}
+.help-list li b{color:var(--tx);font-weight:600}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bd2);border-radius:50px;padding:12px 24px;font-size:.9rem;z-index:99;opacity:0;transition:all .3s;pointer-events:none;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (max-width:520px){.screens{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo" id="logoName">Karaokê <span>do Bulla</span> · Host</div>
+  <div class="badge"><span class="dot off" id="dot"></span><span id="conn">conectando…</span></div>
+</header>
+<div class="wrap">
+  <section class="srv">
+    <div class="srv-label">🖥️ Servidor</div>
+    <div class="srv-title">Ao vivo</div>
+    <div class="srv-sub" id="srvSub">carregando estado…</div>
+  </section>
+
+  <section class="addr">
+    <div class="addr-title">Endereço dos convidados</div>
+    <div class="addr-url">
+      <b id="guestUrl">…</b>
+      <button class="btn-mini" id="btnCopy">Copiar</button>
+      <button class="btn-mini" id="btnRefresh" title="Rever os IPs do notebook">↻</button>
+    </div>
+    <div class="addr-warn" id="addrWarn">⚠️ Nenhum IP local encontrado — ligue o hotspot do notebook e clique em ↻.</div>
+    <div class="addr-others" id="addrOthers"></div>
+  </section>
+
+  <section class="addr">
+    <div class="addr-title">Nome do karaokê (aparece em todas as telas)</div>
+    <div class="addr-url">
+      <input type="text" id="evName" maxlength="40" placeholder="Ex.: Karaokê da Karime">
+      <button class="btn-mini" id="btnRename">Salvar</button>
+    </div>
+  </section>
+
+  <div class="screens">
+    <div class="scr" id="goGuest"><div class="scr-ico">👥</div><div class="scr-name">Convidado</div><div class="scr-sub">fila em tempo real</div></div>
+    <div class="scr" id="goAdmin"><div class="scr-ico">🎛️</div><div class="scr-name">Painel do artista</div><div class="scr-sub">controlar a fila</div></div>
+    <div class="scr" id="goTv"><div class="scr-ico">📺</div><div class="scr-name">Telão</div><div class="scr-sub">tela da TV/HDMI</div></div>
+  </div>
+  <p class="screens-note">Painel e telão abrem no próprio notebook · Convidado abre como quem está no Wi-Fi.</p>
+
+  <section class="help">
+    <div class="help-title">Lembretes da festa</div>
+    <ul class="help-list">
+      <li>🎤 <span><b>Servidor:</b> deixe a janela “Karaoke do Bulla - servidor” aberta. Fechá-la encerra o app — a fila não se perde, volta ao reabrir.</span></li>
+      <li>📶 <span><b>Wi-Fi:</b> convidados entram no hotspot do notebook e usam o endereço dourado acima (cartão de mesa / QR).</span></li>
+      <li>🔐 <span><b>Painel do artista:</b> pede o código secreto de sempre na primeira vez.</span></li>
+      <li>💡 <span><b>Esta página</b> vive dentro do servidor: sem a janela dele aberta, o endereço não responde.</span></li>
+    </ul>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+const $=(id)=>document.getElementById(id);
+let toastTimer=null;
+function toast(msg){const el=$('toast');el.textContent=msg;el.className='toast show';clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.className='toast';},2600);}
+let guestUrl='';
+let localBase='http://localhost:8080';
+function loadHost(){
+  fetch('/api/host').then((r)=>r.json()).then((h)=>{
+    const ips=(h&&h.ips)||[];
+    const port=(h&&h.port)||'8080';
+    // Prefere o IP do hotspot do Windows (padrão 192.168.137.x)
+    ips.sort((a,b)=>((b.indexOf('192.168.137.')===0)-(a.indexOf('192.168.137.')===0)));
+    const ip=ips[0]||'';
+    guestUrl=ip?('http://'+ip+':'+port):'';
+    localBase='http://localhost:'+port;
+    $('guestUrl').textContent=guestUrl||'indisponível';
+    $('addrWarn').classList.toggle('show',!ip);
+    $('addrOthers').textContent=(ips.length>1)?('Outros endereços: '+ips.join(' · ')):'';
+  }).catch(()=>{
+    $('guestUrl').textContent='indisponível';
+    $('addrWarn').classList.add('show');
+  });
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');done();}catch(e){toast('Não deu para copiar — selecione manualmente.');}
+  document.body.removeChild(ta);
+}
+function copyUrl(){
+  if(!guestUrl){toast('Nenhum endereço para copiar.');return;}
+  const done=()=>toast('Endereço copiado! 📋');
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(guestUrl).then(done).catch(()=>fallbackCopy(guestUrl,done));}
+  else fallbackCopy(guestUrl,done);
+}
+$('btnCopy').addEventListener('click',copyUrl);
+$('btnRefresh').addEventListener('click',loadHost);
+$('goGuest').addEventListener('click',()=>{if(guestUrl)window.open(guestUrl,'_blank');else toast('Sem IP — ligue o hotspot e clique em ↻.');});
+$('goAdmin').addEventListener('click',()=>window.open(localBase+'/admin.html','_blank'));
+$('goTv').addEventListener('click',()=>window.open(localBase+'/tv.html','_blank'));
+/* Estado em tempo real: mesmo SSE das outras telas */
+const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+function paintBrand(s){
+  const n=s.eventName||'Karaokê do Bulla';
+  document.title=n+' — Host';
+  const i=n.indexOf(' ');
+  $('logoName').innerHTML=esc(i>0?n.slice(0,i):n)+(i>0?' <span>'+esc(n.slice(i+1))+'</span>':'')+' · Host';
+  const inp=$('evName');
+  if(document.activeElement!==inp&&inp.value!==n) inp.value=n;
+}
+function saveName(){
+  const v=$('evName').value.trim();
+  if(!v){toast('Digite um nome para o karaokê.');return;}
+  let code=localStorage.getItem('karaokeAdminCode')||'';
+  if(!code){
+    code=window.prompt('Código secreto do painel (autoriza a mudança):')||'';
+    code=code.trim();
+    if(!code) return;
+  }
+  fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code,op:'rename',value:v})})
+    .then((r)=>r.json())
+    .then((r)=>{
+      if(r.ok){localStorage.setItem('karaokeAdminCode',code);toast('Nome atualizado em todas as telas! 🎉');}
+      else if(r.msg==='Código incorreto.'){localStorage.removeItem('karaokeAdminCode');toast('Código incorreto — tente de novo.');}
+      else toast(r.msg||'Não foi possível salvar.');
+    })
+    .catch(()=>toast('Falha de conexão com o servidor.'));
+}
+$('btnRename').addEventListener('click',saveName);
+$('evName').addEventListener('keydown',(e)=>{if(e.key==='Enter')saveName();});
+function render(s){
+  paintBrand(s);
+  const n=(s.fila||[]).length;
+  $('srvSub').textContent=(s.open?'Inscrições abertas':'Inscrições fechadas')+' · '+
+    (n===1?'1 pessoa na fila':n+' pessoas na fila');
+}
+fetch('/state').then((r)=>r.json()).then((s)=>{if(s)render(s);}).catch(()=>{});
+const es=new EventSource('/events');
+es.onmessage=(e)=>{
+  try{
+    render(JSON.parse(e.data));
+    $('dot').classList.remove('off');
+    $('conn').textContent='ao vivo';
+  }catch(err){/* pacote inválido: ignora */}
+};
+es.onerror=()=>{
+  $('dot').classList.add('off');
+  $('conn').textContent='reconectando…';
+};
+loadHost();
+</script>
+</body>
+</html>

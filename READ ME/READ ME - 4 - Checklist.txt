@@ -1,0 +1,115 @@
+CHECKLIST DA FESTA
+
+COMO USAR
+Siga na ordem: ensaio em casa (dias antes), montagem no local
+(30 a 60 min antes) e conduta durante a festa. Marque cada [ ]
+ao concluir. Qualquer falha no ensaio: o README 3 traz o
+diagnóstico do sintoma correspondente.
+
+------------------------------------------------------------------
+ETAPA 1 - ENSAIO EM CASA (1 a 2 dias antes)
+------------------------------------------------------------------
+[ ] Estrutura conferida: C:\karaoke\ com server.js e
+    repertorio.json na raiz + pasta public\ com os 3 HTML.
+[ ] Servidor roda: no terminal, cd C:\karaoke e node server.js.
+[ ] Console mostra "[CATALOGO] N musica(s) carregada(s)" com
+    N maior que zero e igual ao seu repertório.
+[ ] Notebook ligado na tomada durante o ensaio.
+[ ] Hotspot do notebook LIGADO.
+[ ] Celular 1 (convidado): abre o endereço impresso no console,
+    busca uma música e envia um pedido.
+[ ] Celular 2 (artista): abre /admin.html, entra com o código
+    secreto e clica em "Chamar".
+[ ] TV no HDMI: abre /tv.html; o "cantando agora" aparece na
+    hora, sem apertar F5.
+[ ] "Encerrou" no painel -> TV e celular atualizam sozinhos.
+[ ] Toggle de inscrições: fechar e abrir funciona.
+[ ] Anotar aqui o endereço do convidado: ____________________
+
+------------------------------------------------------------------
+ETAPA 2 - QR CODE (ainda em casa)
+------------------------------------------------------------------
+1. O QR deve codificar o ENDEREÇO DO CONVIDADO (ex.:
+   http://192.168.137.1:8080) - com http:// e com a porta.
+2. Como gerar sem internet: com o servidor rodando, abra o
+   endereço do app no Chrome ou Edge do notebook e clique com
+   o botão direito na página > "Criar código QR para esta
+   página". Ou use qualquer gerador online de sua preferência.
+3. Se o hotspot for o do Windows, o IP costuma ser sempre
+   192.168.137.1 - ainda assim, no local compare o QR com o
+   endereço impresso no console antes de colocar na mesa.
+4. Imprimir em papel e testar: escanear de 1,5 m de distância
+   e com a luz baixa (o salão estará mais escuro que casa).
+5. Imprimir 2 vias: mesa + reserva na pasta do show.
+
+------------------------------------------------------------------
+ETAPA 3 - CARD DE MESA
+------------------------------------------------------------------
+Imprimir junto com o QR (texto pronto, troque o nome do Wi-Fi):
+
+  ------------------------------------------------------------
+   KARAOKÊ DO BULLA - cante comigo esta noite!
+  ------------------------------------------------------------
+   1. Conecte no Wi-Fi [PREENCHER NOME]
+   2. Aponte a câmera para o QR abaixo
+  ------------------------------------------------------------
+   1.200+ músicas no repertório: busque a sua, digite seu
+   nome/apelido e aguarde o chamado no telão.
+  ------------------------------------------------------------
+
+Dicas:
+- Escreva TAMBÉM o endereço por extenso embaixo do QR
+  (ex.: 192.168.137.1:8080). Se a câmera de alguém falhar,
+  a pessoa digita no navegador.
+- Plastificar ou usar porta-acrílico protege de bebidas.
+- O card é fixo; o QR é o único item que depende do IP.
+
+------------------------------------------------------------------
+ETAPA 4 - MONTAGEM NO LOCAL (30 a 60 min antes)
+------------------------------------------------------------------
+[ ] Suspensão do notebook desativada (energia: "nunca
+    suspender" na tomada) - notebook dormindo = festa sem app.
+[ ] Hotspot do Windows: desativar o desligamento automático
+    quando não houver dispositivos conectados.
+[ ] Terminal aberto: cd C:\karaoke e node server.js.
+[ ] Comparar o IP do console com o do QR impresso. Mudou?
+    Refazer o QR ou escrever o endereço novo à mão no card.
+[ ] Painel do artista aberto e logado.
+[ ] "Zerar tudo" clicado: fila limpa, sem testes do ensaio.
+[ ] Inscrições abertas (toggle verde).
+[ ] TV ligada no HDMI com /tv.html aberto; um toque na tela
+    = tela cheia.
+[ ] Um pedido de teste pelo celular e removido depois.
+[ ] Kit do show: carregador do notebook, cabo HDMI extra,
+    celular do artista carregado, QR reserva, caneta.
+
+------------------------------------------------------------------
+ETAPA 5 - DURANTE A FESTA
+------------------------------------------------------------------
+- Janela do terminal ABERTA e intocada - ela É o servidor.
+- Não desligar o hotspot nem fechar o navegador da TV.
+- TV reiniciou ou a página fechou? Reabrir o endereço: a fila
+  continua lá (fica salva em fila.json).
+- Caiu a energia? Ao religar, rode node server.js novamente:
+  a fila volta de onde parou; quem estava "cantando" volta ao
+  topo da fila automaticamente.
+- Entre blocos, encerre ou remova pedidos esquecidos no painel
+  para o rodízio seguir justo.
+
+------------------------------------------------------------------
+ETAPA 6 - PLANO B ONLINE: THE LIST
+------------------------------------------------------------------
+Se o app local falhar e o salão tiver Wi-Fi de verdade:
+The List (https://list.posterposter.app/karaoke) - fila de
+pedidos online, já validada por você. Exige internet no local;
+por isso é o plano B, nunca o plano A. Deixe o link salvo nos
+favoritos do celular durante o ensaio.
+
+------------------------------------------------------------------
+DEPOIS DA FESTA
+------------------------------------------------------------------
+[ ] Ctrl+C no terminal encerra o servidor.
+[ ] O registro da noite está em fila.json - copie o arquivo se
+    quiser guardar o histórico.
+[ ] Para a próxima festa: botão "Zerar tudo" no painel apaga
+    fila, palco e histórico de uma vez.

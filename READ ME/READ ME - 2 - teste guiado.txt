@@ -1,0 +1,36 @@
+TESTE GUIADO (CONVIDADO → ARTISTA → TV)
+Objetivo: simular a festa em casa em ~10 minutos e provar que as 3 telas conversam em tempo real, sem recarregar nada.
+
+Preparação (2 min)
+
+Servidor rodando (Parte 1) e hotspot do notebook ativo.
+No notebook, abra duas janelas lado a lado: admin.html e tv.html. Se tiver TV com HDMI, abra a tv.html nela e deixe em tela cheia (F11).
+No celular, conectado ao hotspot, abra http://SEU-IP:8080 (o IP que o console imprimiu).
+Teste A — O pedido do convidado (celular)
+
+Na busca, digite sem acento e em minúsculas (ex.: evidencias). Se digitar algo genérico como só a, deve vir no máximo 60 resultados + dica para refinar.
+Toque no resultado certo da lista — o convidado nunca digita o nome da música.
+No sheet, digite o nome/apelido (máx. 40 caracteres) e toque em "Quero cantar!".
+✅ O celular deve mostrar seu pedido na fila com o selo "É VOCÊ ✨".
+Teste B — Tempo real (a prova de fogo) Olhe o admin e a TV sem recarregar nenhuma página: o pedido deve ter aparecido nos dois na hora. Na TV, confira também a tipografia gigante, a lista de "Próximos" (4) e o rodapé com o Wi-Fi.
+
+👉 Se algo só aparece depois de F5, anote o sintoma — é o caso mais comum da tabela da Parte 3.
+
+Teste C — Chamar e encerrar (admin)
+
+Entre no admin com o código (padrão: bulla2026).
+Toque em 🎤 Chamar → a TV passa a mostrar "Cantando agora" com música + artista + nome; o item sai da fila em todas as telas.
+Toque em ✅ Encerrou → o histórico registra "cantou" e o próximo é chamado automaticamente. Com o rodízio ligado, quem cantou menos vezes vai primeiro; empate = ordem de chegada.
+Teste D — Controles e proteções
+
+⏭ Pular → registra "pulou" no histórico. ↑↓ → reordena. ✕ Remover → tira da fila.
+Feche as inscrições → o celular bloqueia novos pedidos; reabra e confirme que volta.
+Faça 3 pedidos com a mesma pessoa → o 4º é recusado. Tente pedir a mesma música 2x → recusado. As mensagens devem aparecer no celular sem quebrar a página.
+Teste E — Resistência
+
+F5 no celular → fila intacta e o nome da pessoa lembrado (não pede de novo).
+Pare o servidor (Ctrl + C) e rode node server.js de novo → a fila sobrevive (fica no fila.json) e ninguém fica travado como "cantando" — a TV volta ao estado limpo.
+Fechamento
+
+No admin, toque em Reset para zerar os dados do teste antes da festa real.
+Se tudo passou, o app está aprovado. Se algo falhou, anote o que você fez + o que apareceu (terminal e F12 → Console) e cole aqui que eu corrijo apontando o arquivo e o trecho exatos.

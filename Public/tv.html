@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karaokê do Bulla — Telão</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f0f0f'/%3E%3Ctext x='16' y='23' font-family='serif' font-size='20' font-weight='700' fill='%23d4a853' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f0f;--card:#1a1a1a;--elev:#171717;--gold:#d4a853;--gold-soft:rgba(212,168,83,.12);--tx:#f5f5f5;--mut:#a3a3a3;--dim:#666;--bd:#2a2a2a;--grn:#5aa86c;--rd:#c0554f;--cream:#f7f1e3;--ink:#141414}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.4;-webkit-font-smoothing:antialiased;overflow:hidden;display:flex;flex-direction:column;height:100vh;padding:2.6vh 3vw 0}
+.tv-logo{position:fixed;top:2.6vh;left:3vw;z-index:30;font-family:Georgia,'Times New Roman',serif;font-size:1.2rem;font-weight:700;color:var(--gold);letter-spacing:-.5px}
+.tv-logo span{color:var(--tx);font-weight:400}
+.stage{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;min-height:0}
+.eyebrow{font-size:clamp(.8rem,1.6vw,1.15rem);letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:1.6vh}
+.tv-name{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:clamp(2.4rem,7.6vw,6.8rem);color:var(--gold);line-height:1.08;word-break:break-word}
+.tv-song{font-size:clamp(1.4rem,3.3vw,2.9rem);font-weight:600;margin-top:1.2vh}
+.tv-artist{font-size:clamp(.95rem,2vw,1.6rem);color:var(--mut);margin-top:.4vh;min-height:1.2em}
+.idle{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.4rem,3.4vw,2.7rem);color:var(--mut)}
+.divider{width:150px;height:2px;margin:2vh auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.band{flex:none;display:flex;gap:1.6vw;align-items:stretch;width:100%;margin-top:1.6vh;min-height:0}
+.qwrap{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:1.3vh 1.4vw}
+.q-title{font-size:clamp(.7rem,1.2vw,.95rem);letter-spacing:4px;text-transform:uppercase;color:var(--mut);margin-bottom:.6vh;display:flex;justify-content:space-between;align-items:baseline}
+.cols{display:grid;grid-template-columns:1fr 1fr;column-gap:3vw;flex:1;align-content:start}
+.cols.one{grid-template-columns:1fr}
+.col{min-width:0}
+.nx{display:flex;align-items:center;gap:14px;padding:.85vh 4px;border-bottom:1px solid var(--bd);text-align:left}
+.nx:last-child{border-bottom:none}
+.nx-pos{width:clamp(26px,3.6vh,42px);height:clamp(26px,3.6vh,42px);border-radius:50%;background:var(--elev);color:var(--gold);font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;font-size:clamp(.8rem,1.7vw,1.2rem)}
+.nx-info{min-width:0;flex:1}
+.nx-name{font-size:clamp(1.1rem,2.4vw,1.85rem);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nx-song{font-size:clamp(.8rem,1.5vw,1.15rem);color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nx-empty{padding:2vh 10px;text-align:center;color:var(--dim);font-size:clamp(.85rem,1.5vw,1.1rem)}
+.qrzone{flex:none;position:relative;display:flex;align-items:center;justify-content:center}
+#qrSmall{display:flex;align-items:center;justify-content:center}
+#qrSmall canvas{width:auto;display:block;border-radius:6px}
+.qr-hint{position:absolute;bottom:calc(100% + 12px);right:0;background:var(--gold-soft);border:1px solid var(--gold);color:var(--tx);border-radius:50px;padding:8px 18px;font-size:clamp(.8rem,1.4vw,1.05rem);white-space:nowrap;pointer-events:none}
+.qr-fail{color:var(--rd);font-size:clamp(.75rem,1.3vw,1rem);text-align:center;max-width:16vw}
+.poster{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:0}
+.poster.show{display:flex}
+.poster canvas{height:42vh;width:auto;max-width:56vw;border-radius:10px;box-shadow:0 0 40px rgba(212,168,83,.15)}
+.poster-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.5rem,3.4vw,2.8rem);color:var(--gold);margin-top:2vh}
+.foot{flex:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:1.4vh 0;border-top:1px solid var(--bd);font-size:clamp(.8rem,1.4vw,1.05rem);color:var(--mut);margin-top:1.4vh}
+.foot b{color:var(--gold);font-weight:600}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);margin-right:6px}
+.dot.off{background:var(--rd)}
+.hint{position:fixed;bottom:9vh;left:50%;transform:translateX(-50%);background:var(--gold-soft);border:1px solid var(--gold);color:var(--tx);border-radius:50px;padding:10px 22px;font-size:clamp(.85rem,1.6vw,1.1rem);cursor:pointer;z-index:10;transition:opacity .4s}
+.hint.off{opacity:0;pointer-events:none}
+@media (max-width:700px){.band{flex-direction:column}.qr-hint{position:static;margin-bottom:6px}#qrSmall{height:14vh;min-height:0}.poster canvas{height:34vh;max-width:80vw}.qr-fail{max-width:60vw}}
+</style>
+</head>
+<body>
+<div class="tv-logo" id="tvLogo">Karaokê <span>do Bulla</span></div>
+<section class="stage" id="stage">
+  <div class="eyebrow" id="eyebrow">🎤 Cantando agora</div>
+  <div class="idle" id="idle">O palco está livre — escolha sua música no celular</div>
+  <div id="cur" style="display:none">
+    <div class="tv-name" id="curName"></div>
+    <div class="tv-song" id="curSong"></div>
+    <div class="tv-artist" id="curArtist"></div>
+  </div>
+  <div class="divider"></div>
+</section>
+<section class="band" id="band">
+  <div class="qwrap">
+    <div class="q-title"><span>Próximos</span><span id="nxCount"></span></div>
+    <div class="cols one" id="cols">
+      <div class="col" id="colA"></div>
+      <div class="col" id="colB"></div>
+    </div>
+  </div>
+  <div class="qrzone">
+    <div class="qr-hint">Aponte a câmera e seja a estrela! ↓</div>
+    <div id="qrSmall"></div>
+    <div class="qr-fail" id="qrFailS" hidden>Wi-Fi sem IP — ligue o hotspot do notebook</div>
+  </div>
+</section>
+<section class="poster" id="poster">
+  <div class="eyebrow">🎤 Palco livre</div>
+  <div id="qrBig"></div>
+  <div class="qr-fail" id="qrFailB" hidden>Wi-Fi sem IP — ligue o hotspot do notebook</div>
+  <div class="poster-title">Aponte a câmera e seja a estrela!</div>
+</section>
+<footer class="foot">
+  <span>📶 Wi-Fi: <b id="wifiName">…</b></span>
+  <span><span class="dot off" id="dot"></span><b id="urlTv">…</b></span>
+</footer>
+<div class="hint" id="hint">👆 Toque na tela para tela cheia</div>
+<script>
+'use strict';
+/* ===== AJUSTE AQUI (aparece no rodapé do telão) ===== */
+const WIFI_NAME = '[PREENCHER NOME DO WI-FI]';
+const TV_URL    = 'http://192.168.137.1:8080'; // confira com o IP impresso no console do servidor
+/* ===================================================== */
+const $=(id)=>document.getElementById(id);
+const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+$('wifiName').textContent=WIFI_NAME;
+$('urlTv').textContent=TV_URL;
+let state={current:null,fila:[]};
+/* Respiro simétrico: espaçamento de baixo da lista = o de cima; QR acompanha a altura do box.
+   O QR é zerado ANTES da medição — senão ele sustenta a altura do box e nada muda. */
+function balanceQR(){
+  const wrap=document.querySelector('.qwrap');
+  if(!wrap) return;
+  const cv=document.querySelector('#qrSmall canvas');
+  if(cv){cv.style.height='0px';cv.style.width='0px';}
+  const first=wrap.querySelector('.nx');
+  if(first){
+    const gap=first.getBoundingClientRect().top-wrap.getBoundingClientRect().top;
+    wrap.style.paddingBottom=Math.max(0,Math.round(gap))+'px';
+  }else{
+    wrap.style.paddingBottom='';
+  }
+  if(cv){cv.style.height=Math.round(wrap.getBoundingClientRect().height)+'px';cv.style.width='auto';}
+}
+window.addEventListener('resize',balanceQR);
+/* ---------- QR em JavaScript puro — zero dependência, offline ---------- */
+function qrMatrix(text){
+  const EXP=new Uint8Array(512),LOG=new Uint8Array(256);
+  (function(){let x=1;for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&256)x^=0x11d;}for(let i=255;i<512;i++)EXP[i]=EXP[i-255];})();
+  const gmul=(a,b)=>{if(!a||!b)return 0;return EXP[LOG[a]+LOG[b]];};
+  function rsGen(n){let g=[1];for(let i=0;i<n;i++){const r=new Array(g.length+1).fill(0);for(let j=0;j<g.length;j++){r[j]^=g[j];r[j+1]^=gmul(g[j],EXP[i]);}g=r;}return g;}
+  function rsRem(data,ecLen){const g=rsGen(ecLen);const res=data.concat(new Array(ecLen).fill(0));for(let i=0;i<data.length;i++){const k=res[i];if(k)for(let j=1;j<g.length;j++)res[i+j]^=gmul(g[j],k);}return res.slice(data.length);}
+  const utf8=[];
+  for(let i=0;i<text.length;i++){
+    let c=text.codePointAt(i);
+    if(c>0xFFFF)i++;
+    if(c<0x80)utf8.push(c);
+    else if(c<0x800)utf8.push(0xC0|(c>>6),0x80|(c&63));
+    else if(c<0x10000)utf8.push(0xE0|(c>>12),0x80|((c>>6)&63),0x80|(c&63));
+    else utf8.push(0xF0|(c>>18),0x80|((c>>12)&63),0x80|((c>>6)&63),0x80|(c&63));
+  }
+  if(utf8.length>134)throw new Error('texto longo demais para o QR');
+  const bits=[];
+  const put=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>i)&1);};
+  put(4,4);put(utf8.length,8);
+  utf8.forEach((c)=>put(c,8));
+  while(bits.length%8)bits.push(0);
+  const data=[];
+  for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b);}
+  const pad=[0xEC,0x11];let pi=0;
+  while(data.length<136)data.push(pad[pi++&1]);
+  const blocks=[data.slice(0,68),data.slice(68,136)];
+  const ecs=[rsRem(blocks[0],18),rsRem(blocks[1],18)];
+  const final=[];
+  for(let i=0;i<68;i++){final.push(blocks[0][i],blocks[1][i]);}
+  for(let i=0;i<18;i++){final.push(ecs[0][i],ecs[1][i]);}
+  const N=41,m=Array.from({length:N},()=>new Array(N).fill(null));
+  function setFinder(r,c){for(let i=-1;i<=7;i++)for(let j=-1;j<=7;j++){const rr=r+i,cc=c+j;if(rr<0||rr>=N||cc<0||cc>=N)continue;m[rr][cc]=(i>=0&&i<=6&&j>=0&&j<=6&&(i===0||i===6||j===0||j===6))||(i>=2&&i<=4&&j>=2&&j<=4);}}
+  setFinder(0,0);setFinder(0,N-7);setFinder(N-7,0);
+  for(let i=8;i<N-8;i++){if(m[6][i]===null)m[6][i]=(i%2===0);if(m[i][6]===null)m[i][6]=(i%2===0);}
+  for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)m[34+i][34+j]=(Math.abs(i)===2||Math.abs(j)===2||(i===0&&j===0));
+  for(let i=0;i<=8;i++){if(m[8][i]===null)m[8][i]=false;if(m[i][8]===null)m[i][8]=false;}
+  for(let i=N-8;i<N;i++){if(m[8][i]===null)m[8][i]=false;if(m[i][8]===null)m[i][8]=false;}
+  const FB=[1,1,1,0,1,1,1,1,1,0,0,0,1,0,0]; /* formato: nivel L + mascara 0 */
+  for(let i=0;i<=5;i++)m[8][i]=FB[i];
+  m[8][7]=FB[6];m[8][8]=FB[7];m[7][8]=FB[8];
+  for(let i=9;i<15;i++)m[14-i][8]=FB[i];
+  for(let i=0;i<8;i++)m[N-1-i][8]=FB[i];
+  for(let i=8;i<15;i++)m[8][N-15+i]=FB[i];
+  m[N-8][8]=true;
+  const maskF=(i,j)=>((i+j)&1)===0;
+  let up=true,bi=0;const totalBits=final.length*8;
+  for(let c=N-1;c>0;c-=2){
+    if(c===6)c--;
+    for(let t=0;t<N;t++){
+      const r=up?(N-1-t):t;
+      for(let k=0;k<2;k++){
+        const cc=c-k;
+        if(m[r][cc]!==null)continue;
+        let v=false;
+        if(bi<totalBits)v=((final[bi>>3]>>(7-(bi&7)))&1)===1;
+        bi++;
+        if(maskF(r,cc))v=!v;
+        m[r][cc]=v;
+      }
+    }
+    up=!up;
+  }
+  return m;
+}
+function drawQR(el,text){
+  try{
+    const mtx=qrMatrix(text);
+    const s=8,q=4,n=(mtx.length+q*2)*s;
+    const cv=document.createElement('canvas');
+    cv.width=n;cv.height=n;
+    const g=cv.getContext('2d');
+    g.fillStyle='#f7f1e3';g.fillRect(0,0,n,n);
+    g.fillStyle='#141414';
+    for(let r=0;r<mtx.length;r++)for(let c=0;c<mtx.length;c++)if(mtx[r][c])g.fillRect((c+4)*s,(r+4)*s,s,s);
+    el.innerHTML='';el.appendChild(cv);
+    return true;
+  }catch(e){return false;}
+}
+/* ---------- IP dos convidados: /api/host (o mesmo da host.html) ---------- */
+function loadHost(){
+  fetch('/api/host').then((r)=>r.json()).then((h)=>{
+    const ips=(h&&h.ips)||[];const port=(h&&h.port)||'8080';
+    ips.sort((a,b)=>((b.indexOf('192.168.137.')===0)-(a.indexOf('192.168.137.')===0)));
+    const ip=ips[0]||'';
+    if(ip){
+      const url='http://'+ip+':'+port;
+      const ok1=drawQR($('qrSmall'),url);
+      const ok2=drawQR($('qrBig'),url);
+      if(!ok1||!ok2){$('qrFailS').hidden=false;$('qrFailB').hidden=false;}
+      balanceQR();
+    }else{
+      $('qrFailS').hidden=false;$('qrFailB').hidden=false;
+    }
+  }).catch(()=>{$('qrFailS').hidden=false;$('qrFailB').hidden=false;});
+}
+function render(){
+  const n=state.eventName||'Karaokê do Bulla';
+  const i=n.indexOf(' ');
+  $('tvLogo').innerHTML=esc(i>0?n.slice(0,i):n)+(i>0?' <span>'+esc(n.slice(i+1))+'</span>':'');
+  document.title=n+' — Telão';
+  const c=state.current;
+  const fila=state.fila||[];
+  if(c){
+    $('eyebrow').textContent='🎤 Cantando agora';
+    $('idle').style.display='none';
+    $('cur').style.display='block';
+    $('curName').textContent=c.name;
+    $('curSong').textContent=c.t;
+    $('curArtist').textContent=c.a||'';
+  }else{
+    $('eyebrow').textContent='🎤 Escolha sua música no celular';
+    $('idle').style.display='block';
+    $('cur').style.display='none';
+  }
+  if(!c&&!fila.length){
+    $('band').style.display='none';
+    $('poster').classList.add('show');
+  }else{
+    $('band').style.display='flex';
+    $('poster').classList.remove('show');
+  }
+  const prox=fila.slice(0,6);
+  $('nxCount').textContent=prox.length?('· '+fila.length+' na fila'):'';
+  $('cols').classList.toggle('one',prox.length<=3);
+  const half=prox.length<=3?prox.length:Math.ceil(prox.length/2);
+  const colA=prox.slice(0,half),colB=prox.slice(half);
+  function itemHTML(it,i){
+    return '<div class="nx">'
+      +'<div class="nx-pos">'+(i+1)+'</div>'
+      +'<div class="nx-info">'
+      +'<div class="nx-name">'+esc(it.name)+'</div>'
+      +'<div class="nx-song">'+esc(it.t)+(it.a?' — '+esc(it.a):'')+'</div>'
+      +'</div></div>';
+  }
+  $('colA').innerHTML=colA.length?colA.map(itemHTML).join(''):'<div class="nx-empty">A fila está vazia — peça sua música pelo celular</div>';
+  $('colB').innerHTML=colB.map((it,i)=>itemHTML(it,i+half)).join('');
+  balanceQR();
+}
+fetch('/state').then((r)=>r.json()).then((s)=>{if(s){state=s;render();}}).catch(()=>{});
+const es=new EventSource('/events');
+es.onmessage=(e)=>{
+  try{
+    state=JSON.parse(e.data);
+    render();
+    $('dot').classList.remove('off');
+  }catch(err){/* pacote inválido: ignora */}
+};
+es.onerror=()=>{$('dot').classList.add('off');};
+loadHost();
+/* Tela cheia com um toque — sem controles visíveis */
+function goFull(){
+  const d=document.documentElement;
+  if(!document.fullscreenElement){
+    if(d.requestFullscreen) d.requestFullscreen().catch(()=>{});
+    else if(d.webkitRequestFullscreen) d.webkitRequestFullscreen();
+  }
+  $('hint').classList.add('off');
+}
+document.addEventListener('click',goFull);
+document.addEventListener('keydown',goFull);
+document.addEventListener('fullscreenchange',()=>{
+  if(document.fullscreenElement) $('hint').classList.add('off');
+  else $('hint').classList.remove('off');
+});
+</script>
+</body>
+</html>

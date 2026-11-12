@@ -1,0 +1,46 @@
+INSTALAÇÃO E PRIMEIRO BOOT
+O que já deve existir em C:\karaoke\:
+
+C:\karaoke\
+   server.js
+   repertorio.json
+   public\
+      index.html
+      admin.html
+      tv.html
+⚠️ Extensões: no Explorador de Arquivos, ative Exibir → Extensões de nomes de arquivo e confira que os arquivos terminam em .js/.html — e não server.js.txt (erro clássico do Bloco de Notas).
+
+Passo 1 — Instalar o Node.js (só uma vez)
+Acesse nodejs.org e baixe a versão LTS (a marcada como "Recommended For Most Users").
+Instale com Next em tudo — não precisa marcar nenhuma opção extra.
+Abra um Prompt de Comando novo (tecla Windows → digite cmd → Enter) e teste:
+node -v
+Deve responder algo como v20.x.x ou v22.x.x.
+
+Passo 2 — Ligar o hotspot do notebook (ANTES de subir o servidor)
+Configurações → Rede e Internet → Ponto de acesso móvel → ative.
+Em Editar, defina nome e senha do Wi-Fi da festa — anote os dois, vão no card de mesa (Parte 4) e no rodapé da TV.
+Ligar o hotspot antes do servidor garante que o console imprima o IP correto da rede da festa.
+Passo 3 — Rodar o servidor
+No Prompt de Comando:
+
+cd "C:\karaoke"
+node server.js
+As aspas protegem o comando caso o caminho tenha espaços.
+
+✅ O console deve mostrar:
+
+uma linha [CATALOGO] com o total de músicas carregadas (se aparecer 0, pare — a Parte 3 resolve);
+o endereço local http://localhost:8080;
+os IPs da máquina para os aparelhos (ex.: http://192.168.137.1:8080) — anote esse IP.
+🔒 Se o Windows perguntar sobre o firewall, marque "Redes privadas" e clique em Permitir acesso — sem isso os celulares não abrem a página.
+
+⚠️ Deixe a janela do terminal aberta o tempo todo — fechar a janela encerra o servidor. Para parar: Ctrl + C. Para reiniciar: node server.js de novo (a fila sobrevive, fica salva no fila.json).
+
+Passo 4 — Teste rápido (30 segundos, no notebook)
+No navegador do próprio notebook:
+
+http://localhost:8080 → página do convidado, com a busca visível;
+http://localhost:8080/admin.html → painel do artista (código padrão: bulla2026);
+http://localhost:8080/tv.html\ → telão.
+Se as três páginas abrirem, o servidor está pronto.

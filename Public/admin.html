@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karaokê do Bulla — Painel do Artista</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f0f0f'/%3E%3Ctext x='16' y='23' font-family='serif' font-size='20' font-weight='700' fill='%23d4a853' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f0f;--card:#1a1a1a;--elev:#171717;--gold:#d4a853;--gold-h:#b88d3e;--gold-soft:rgba(212,168,83,.12);--tx:#f5f5f5;--mut:#a3a3a3;--dim:#666;--bd:#2a2a2a;--bd2:#3a3a3a;--grn:#5aa86c;--rd:#c0554f}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 80px}
+.top{position:sticky;top:0;z-index:20;background:rgba(15,15,15,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:Georgia,'Times New Roman',serif;font-size:1.2rem;font-weight:700;color:var(--gold);letter-spacing:-.5px}
+.logo span{color:var(--tx);font-weight:400}
+.badge{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--mut)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--grn)}
+.dot.off{background:var(--rd)}
+.gate{max-width:360px;margin:12vh auto 0;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:28px 24px;text-align:center}
+.gate-ico{font-size:2rem;margin-bottom:8px}
+.gate-title{font-family:Georgia,serif;font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:4px}
+.gate-sub{font-size:.85rem;color:var(--mut);margin-bottom:18px}
+.gate input{width:100%;padding:14px 16px;font-size:16px;background:var(--bg);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);outline:none;text-align:center;letter-spacing:2px}
+.gate input:focus{border-color:var(--gold)}
+.btn-go{width:100%;margin-top:14px;padding:14px;border:none;border-radius:50px;background:var(--gold);color:#0f0f0f;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-go:hover{background:var(--gold-h)}
+.btn-go:disabled{opacity:.4;cursor:not-allowed}
+.now{background:linear-gradient(135deg,var(--card),var(--elev));border:1px solid var(--gold);border-radius:14px;padding:18px;margin:16px 0;box-shadow:0 0 24px rgba(212,168,83,.08)}
+.now-label{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.now-name{font-family:Georgia,serif;font-size:1.35rem;color:var(--gold);font-weight:700}
+.now-song{font-size:1.15rem;font-weight:600;margin-top:2px}
+.now-artist{color:var(--mut);font-size:.95rem;min-height:1.4em}
+.now.empty .now-song{font-weight:400;color:var(--mut);font-size:1rem}
+.now-btns{display:flex;gap:10px;margin-top:14px}
+.nb{flex:1;padding:13px 8px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;border:1px solid var(--bd2);background:var(--elev);color:var(--tx);transition:all .2s}
+.nb:disabled{opacity:.35;cursor:not-allowed}
+.nb.done{background:var(--grn);border-color:var(--grn);color:#0f0f0f}
+.nb.done:hover:not(:disabled){filter:brightness(1.1)}
+.nb.skip:hover:not(:disabled){border-color:var(--rd);color:var(--rd)}
+.toggles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.sw-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;cursor:pointer;user-select:none}
+.sw-title{font-size:.9rem;font-weight:600}
+.sw-sub{font-size:.72rem;color:var(--dim)}
+.sw{position:relative;width:44px;height:24px;flex:none}
+.sw input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:var(--bd2);border-radius:50px;transition:background .2s}
+.slider::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s}
+.sw input:checked+.slider{background:var(--grn)}
+.sw input:checked+.slider::before{transform:translateX(20px)}
+.danger-zone{display:flex;justify-content:flex-end;margin-bottom:6px}
+.btn-reset{background:none;border:1px solid var(--rd);color:var(--rd);border-radius:50px;padding:7px 16px;font-size:.8rem;cursor:pointer;transition:all .2s}
+.btn-reset:hover{background:#2d1f1f}
+.sec-title{font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin:22px 0 10px}
+.q,.hist{border:1px solid var(--bd);border-radius:12px;background:var(--card);overflow:hidden}
+.q-item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd)}
+.q-item:last-child{border-bottom:none}
+.q-pos{width:26px;height:26px;border-radius:50%;background:var(--elev);color:var(--mut);font-size:.8rem;display:flex;align-items:center;justify-content:center;flex:none}
+.q-info{min-width:0;flex:1}
+.q-name{font-size:.95rem;font-weight:600}
+.q-song{font-size:.82rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-actions{display:flex;gap:6px;flex:none}
+.act{width:38px;height:38px;border:1px solid var(--bd2);border-radius:8px;background:transparent;color:var(--mut);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.act:hover{border-color:var(--gold);color:var(--gold)}
+.act.call{width:auto;padding:0 12px;border-color:var(--gold);color:var(--gold);font-weight:600;font-size:.85rem;gap:4px}
+.act.call:hover{background:var(--gold-soft)}
+.act.del:hover{border-color:var(--rd);color:var(--rd)}
+.empty{padding:22px;text-align:center;color:var(--dim);font-size:.88rem}
+.h-item{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:.88rem}
+.h-item:last-child{border-bottom:none}
+.h-ico{flex:none;font-size:1rem}
+.h-info{flex:1;min-width:0}
+.h-name{font-weight:600}
+.h-song{color:var(--mut);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-time{color:var(--dim);font-size:.75rem;flex:none}
+.h-item.pulou .h-name{color:var(--mut)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bd2);border-radius:50px;padding:12px 24px;font-size:.9rem;z-index:99;opacity:0;transition:all .3s;pointer-events:none;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--rd);color:var(--rd)}
+@media (max-width:520px){.toggles{grid-template-columns:1fr}.q-actions{flex-direction:column}.act{width:34px;height:32px}.act.call{width:auto;padding:0 10px;height:32px;font-size:.78rem}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo" id="logoName">Karaokê <span>do Bulla</span> · Painel</div>
+  <div class="badge"><span class="dot off" id="dot"></span><span id="conn">conectando…</span></div>
+</header>
+<div class="wrap">
+  <div class="gate" id="gate">
+    <div class="gate-ico">🔐</div>
+    <div class="gate-title">Painel do artista</div>
+    <div class="gate-sub">Digite o código secreto para controlar a fila.</div>
+    <input type="password" id="code" placeholder="Código secreto" autocomplete="current-password">
+    <button class="btn-go" id="gateGo">Entrar 🎤</button>
+  </div>
+  <div id="panel" hidden>
+    <section class="now empty" id="now">
+      <div class="now-label">🎤 Cantando agora</div>
+      <div class="now-name" id="nowName"></div>
+      <div class="now-song" id="nowSong">Ninguém no palco</div>
+      <div class="now-artist" id="nowArtist"></div>
+      <div class="now-btns">
+        <button class="nb done" id="btnDone" disabled>✅ Encerrou</button>
+        <button class="nb skip" id="btnSkip" disabled>⏭ Pular</button>
+      </div>
+    </section>
+    <div class="toggles">
+      <label class="sw-row">
+        <div><div class="sw-title">Inscrições</div><div class="sw-sub" id="openSub"></div></div>
+        <span class="sw"><input type="checkbox" id="swOpen"><span class="slider"></span></span>
+      </label>
+      <label class="sw-row">
+        <div><div class="sw-title">Rodízio</div><div class="sw-sub" id="rodSub"></div></div>
+        <span class="sw"><input type="checkbox" id="swRod"><span class="slider"></span></span>
+      </label>
+    </div>
+    <div class="danger-zone"><button class="btn-reset" id="btnReset">⟳ Zerar tudo</button></div>
+    <h2 class="sec-title">🎶 Fila <span id="qCount"></span></h2>
+    <div class="q" id="queue"></div>
+    <h2 class="sec-title">📜 Últimas performances</h2>
+    <div class="hist" id="hist"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+const $=(id)=>document.getElementById(id);
+const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+let toastTimer=null;
+function toast(msg,type){const el=$('toast');el.textContent=msg;el.className='toast show '+(type||'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.className='toast';},3200);}
+let admCode=localStorage.getItem('karaokeAdminCode')||'';
+let state={open:true,rodizio:true,current:null,fila:[],hist:[]};
+function paintBrand(){
+  const n=state.eventName||'Karaokê do Bulla';
+  document.title=n+' — Painel';
+  const i=n.indexOf(' ');
+  $('logoName').innerHTML=esc(i>0?n.slice(0,i):n)+(i>0?' <span>'+esc(n.slice(i+1))+'</span>':'')+' · Painel';
+}
+function admin(op,extra){
+  return fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:admCode,op:op},extra||{}))})
+    .then((r)=>r.json())
+    .catch(()=>({ok:false,msg:'Falha de conexão com o servidor.'}));
+}
+function handleFail(r){
+  if(r&&r.msg==='Código incorreto.'){
+    admCode='';localStorage.removeItem('karaokeAdminCode');
+    $('gate').hidden=false;$('panel').hidden=true;$('code').value='';
+    return true;
+  }
+  return false;
+}
+function act(op,extra){
+  admin(op,extra).then((r)=>{
+    if(!r.ok&&!handleFail(r)) toast(r.msg||'Não foi possível executar.','err');
+  });
+}
+function fmtTime(at){try{return new Date(at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function render(){
+  paintBrand();
+  const c=state.current;
+  if(c){
+    $('now').classList.remove('empty');
+    $('nowName').textContent=c.name;
+    $('nowSong').textContent=c.t;
+    $('nowArtist').textContent=c.a||'';
+    $('btnDone').disabled=false;
+    $('btnSkip').disabled=false;
+  }else{
+    $('now').classList.add('empty');
+    $('nowName').textContent='';
+    $('nowSong').textContent='Ninguém no palco';
+    $('nowArtist').textContent='';
+    $('btnDone').disabled=true;
+    $('btnSkip').disabled=true;
+  }
+  $('swOpen').checked=!!state.open;
+  $('swRod').checked=!!state.rodizio;
+  $('openSub').textContent=state.open?'Abertas — fila liberada':'Fechadas — só visualização';
+  $('rodSub').textContent=state.rodizio?'Quem cantou menos vai primeiro':'Ordem de chegada';
+  const fila=state.fila||[];
+  $('qCount').textContent=fila.length?('· '+fila.length+' aguardando'):'';
+  if(!fila.length){
+    $('queue').innerHTML='<div class="empty">Ninguém na fila ainda.</div>';
+  }else{
+    $('queue').innerHTML=fila.map((it,i)=>{
+      return '<div class="q-item">'
+        +'<div class="q-pos">'+(i+1)+'</div>'
+        +'<div class="q-info"><div class="q-name">'+esc(it.name)+'</div>'
+        +'<div class="q-song">'+esc(it.t)+(it.a?' — '+esc(it.a):'')+'</div></div>'
+        +'<div class="q-actions">'
+        +'<button class="act call" data-op="start" data-id="'+esc(it.itemId)+'" title="Chamar ao palco">🎤 Chamar</button>'
+        +'<button class="act" data-op="move" data-dir="-1" data-id="'+esc(it.itemId)+'" title="Subir"'+(i===0?' disabled':'')+'>↑</button>'
+        +'<button class="act" data-op="move" data-dir="1" data-id="'+esc(it.itemId)+'" title="Descer"'+(i===fila.length-1?' disabled':'')+'>↓</button>'
+        +'<button class="act del" data-op="remove" data-id="'+esc(it.itemId)+'" title="Remover pedido">✕</button>'
+        +'</div></div>';
+    }).join('');
+  }
+  const hist=(state.hist||[]).slice().reverse().slice(0,20);
+  if(!hist.length){
+    $('hist').innerHTML='<div class="empty">As performances aparecem aqui.</div>';
+  }else{
+    $('hist').innerHTML=hist.map((h)=>{
+      const ok=h.status==='concluido';
+      return '<div class="h-item'+(ok?'':' pulou')+'">'
+        +'<span class="h-ico">'+(ok?'✅':'⏭')+'</span>'
+        +'<div class="h-info"><div class="h-name">'+esc(h.name)+(ok?' cantou':' pulou')+'</div>'
+        +'<div class="h-song">'+esc(h.t)+(h.a?' — '+esc(h.a):'')+'</div></div>'
+        +'<span class="h-time">'+fmtTime(h.at)+'</span></div>';
+    }).join('');
+  }
+}
+$('queue').addEventListener('click',(e)=>{
+  const b=e.target.closest('button[data-op]');
+  if(!b||b.disabled) return;
+  const id=b.getAttribute('data-id');
+  const op=b.getAttribute('data-op');
+  if(op==='start'){
+    act('start',{id:id});
+  }else if(op==='move'){
+    act('move',{id:id,dir:parseInt(b.getAttribute('data-dir'),10)||0});
+  }else if(op==='remove'){
+    if(confirm('Remover esse pedido da fila?')) act('remove',{id:id});
+  }
+});
+$('swOpen').addEventListener('change',()=>act('open',{value:$('swOpen').checked}));
+$('swRod').addEventListener('change',()=>act('rodizio',{value:$('swRod').checked}));
+$('btnDone').addEventListener('click',()=>act('done'));
+$('btnSkip').addEventListener('click',()=>act('skip'));
+$('btnReset').addEventListener('click',()=>{
+  if(confirm('Zerar TUDO? Apaga fila, palco e histórico — não tem volta.')) act('reset');
+});
+/* ---------- PORTÃO: código secreto ---------- */
+function enterPanel(){
+  $('gate').hidden=true;
+  $('panel').hidden=false;
+}
+function tryEnter(){
+  const c=$('code').value.trim();
+  if(!c){toast('Digite o código secreto.','err');return;}
+  admCode=c;
+  fetch('/state').then((r)=>r.json()).then((s)=>{
+    if(!s) throw new Error('sem estado');
+    state=s;render();
+    // Valida o código com um comando inócuo: reenvia o valor atual das inscrições
+    return admin('open',{value:!!state.open});
+  }).then((r)=>{
+    if(!r) return;
+    if(r.ok){
+      localStorage.setItem('karaokeAdminCode',admCode);
+      enterPanel();
+      toast('Bem-vindo ao palco, mestre! 🎤','ok');
+    }else if(!handleFail(r)){
+      toast(r.msg||'Não foi possível entrar.','err');
+    }
+  }).catch(()=>toast('Falha de conexão com o servidor.','err'));
+}
+$('gateGo').addEventListener('click',tryEnter);
+$('code').addEventListener('keydown',(e)=>{if(e.key==='Enter')tryEnter();});
+/* ---------- INÍCIO: estado + tempo real ---------- */
+fetch('/state').then((r)=>r.json()).then((s)=>{if(s){state=s;render();}}).catch(()=>{});
+if(admCode){
+  $('code').value=admCode;
+  tryEnter();
+}
+const es=new EventSource('/events');
+es.onmessage=(e)=>{
+  try{
+    state=JSON.parse(e.data);
+    render();
+    $('dot').classList.remove('off');
+    $('conn').textContent='ao vivo';
+  }catch(err){/* pacote inválido: ignora */}
+};
+es.onerror=()=>{
+  $('dot').classList.add('off');
+  $('conn').textContent='reconectando…';
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+TROUBLESHOOTING
+
+COMO USAR
+Ache o bloco cujo SINTOMA é igual ao que você vê. Cada bloco traz
+CAUSA (o que aconteceu) e AÇÃO (o que fazer, na ordem).
+
+------------------------------------------------------------------
+MAPA RÁPIDO - por onde começar
+------------------------------------------------------------------
+Erro no terminal ao iniciar ............ Sintoma 1 ou 2
+Ícone com TXT no nome .................. Sintoma 2
+Ninguém conecta / conecta e cai ........ Sintoma 3
+Busca não acha nada .................... Sintoma 4
+Só o notebook acessa ................... Sintoma 5
+Página abre, fila não atualiza ......... Sintoma 6
+
+Os sintomas 2 e 3 resolvem a maioria das falhas na 1a execução.
+
+------------------------------------------------------------------
+SINTOMA 1 - "'node' não é reconhecido como um comando interno ou
+externo..." (aparece no terminal)
+------------------------------------------------------------------
+CAUSA
+Node.js não está instalado, ou o terminal foi aberto ANTES da
+instalação — o Windows só recarrega o PATH em terminal novo.
+
+AÇÃO
+1. Instale a versão LTS em https://nodejs.org (Next, Next, Finish).
+2. FECHE o terminal e abra um novo.
+3. Confirme: node --version deve responder algo como v22.x.x.
+
+------------------------------------------------------------------
+SINTOMA 2 - O server.js "não roda" e o ícone aparece como
+documento de texto (server.js TXT)
+------------------------------------------------------------------
+CAUSA
+O arquivo foi salvo como server.js.txt. O Bloco de Notas anexa
+.txt no final e o Windows oculta extensões conhecidas por padrão.
+
+AÇÃO
+1. Explorador de Arquivos > guia Exibir > marque "Extensões de
+   nomes de arquivos".
+2. Renomeie removendo o .txt final: deve ficar exatamente server.js.
+3. A MESMA armadilha vale para repertorio.json (não pode ficar
+   repertorio.json.txt).
+4. Confirme com  dir C:\karaoke  — server.js deve listar sem .txt.
+
+------------------------------------------------------------------
+SINTOMA 3 - Servidor inicia, mas ninguém conecta (ou só funciona
+de vez em quando)
+------------------------------------------------------------------
+CAUSA
+Firewall do Windows bloqueando o Node na rede do hotspot. O aviso
+"Permitir acesso?" aparece UMA vez e passa fácil despercebido.
+
+AÇÃO
+1. Se o aviso do Windows Defender Firewall estiver na tela:
+   marque as DUAS caixas (privada e pública) e clique em
+   "Permitir acesso".
+2. Se o aviso sumiu: Painel de Controle > Sistema e Segurança >
+   Firewall do Windows Defender > "Permitir um aplicativo pelo
+   firewall" > "Alterar configurações" > Node.js > marque
+   Privada e Pública > OK.
+3. Reinicie o servidor (Ctrl+C e depois node server.js de novo).
+
+------------------------------------------------------------------
+SINTOMA 4 - O console imprime "Catálogo carregado: 0 músicas"
+(e a busca do convidado não encontra nada)
+------------------------------------------------------------------
+CAUSA
+O repertorio.json não está na raiz C:\karaoke\ (foi parar em
+public\ ou em outra pasta), está com nome errado, ou o formato
+dos campos não foi reconhecido pelo parser.
+
+AÇÃO
+1. O arquivo deve estar na MESMA pasta do server.js — nunca
+   dentro de public\.
+2. Nome exato: repertorio.json (veja o Sintoma 2 sobre o .txt).
+3. Reinicie o servidor e leia o que ele imprime: se ler 0 músicas,
+   ele pede para você colar as 5 PRIMEIRAS linhas do arquivo.
+   Cole essas linhas no chat que eu ajusto o parser.
+4. Teste direto no navegador do notebook:
+   http://localhost:8080/api/catalogo  — deve responder com a
+   lista de músicas entre colchetes.
+
+------------------------------------------------------------------
+SINTOMA 5 - O celular não abre a página ("não é possível acessar
+este site" / carregamento infinito)
+------------------------------------------------------------------
+CAUSA (verifique NESTA ordem)
+1. Celular não está no hotspot do notebook (ou hotspot desligado).
+2. Endereço digitado errado: sem o http://, com espaço, ou com IP
+   antigo — o IP pode mudar de uma festa para outra.
+3. Firewall do Windows (veja o Sintoma 3).
+
+AÇÃO
+1. Conecte o celular ao Wi-Fi do hotspot do notebook.
+2. Use EXATAMENTE o endereço impresso no console ao iniciar
+   (algo como http://192.168.137.1:8080) — com http:// e com a
+   porta :8080. Confira de novo a cada inicialização.
+3. Se o IP mudou em relação ao ensaio, refaça o QR code impresso.
+4. Todos os celulares falham, mas o notebook abre
+   http://localhost:8080? É rede/firewall: Sintoma 3.
+5. Nem o notebook abre localhost? O servidor caiu: copie a última
+   linha do erro no terminal e me mande.
+
+------------------------------------------------------------------
+SINTOMA 6 - A página abre, mas a fila não atualiza em tempo real
+(ou exibe errado) — erro no console F12
+------------------------------------------------------------------
+CAUSA
+Erro de JavaScript no navegador, cache antigo da página, ou a
+conexão em tempo real (SSE) caiu por instabilidade do hotspot.
+
+AÇÃO
+1. Force a atualização da página (puxe para recarregar no celular;
+   F5 no notebook). O app reconecta sozinho em segundos.
+2. Se persistir: F12 (ou menu > Mais ferramentas > Ferramentas do
+   desenvolvedor) > aba Console > copie a linha VERMELHA completa.
+3. Me mande no formato da REGRA DE OURO. Corrijo apontando o
+   arquivo exato e o trecho corrigido.

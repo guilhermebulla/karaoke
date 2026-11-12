@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karaokê do Bulla</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f0f0f'/%3E%3Ctext x='16' y='23' font-family='serif' font-size='20' font-weight='700' fill='%23d4a853' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f0f;--card:#1a1a1a;--elev:#171717;--gold:#d4a853;--gold-h:#b88d3e;--gold-soft:rgba(212,168,83,.12);--tx:#f5f5f5;--mut:#a3a3a3;--dim:#666;--bd:#2a2a2a;--bd2:#3a3a3a;--grn:#5aa86c;--rd:#c0554f}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 96px}
+.top{position:sticky;top:0;z-index:20;background:rgba(15,15,15,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:Georgia,'Times New Roman',serif;font-size:1.2rem;font-weight:700;color:var(--gold);letter-spacing:-.5px}
+.logo span{color:var(--tx);font-weight:400}
+.badge{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--mut)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--grn)}
+.dot.off{background:var(--rd)}
+.closed{display:none;background:#2d1f1f;border:1px solid var(--rd);border-radius:12px;padding:14px 16px;margin:16px 0;text-align:center;font-size:.92rem}
+.closed b{color:var(--rd)}
+.closed.show{display:block}
+.now{background:linear-gradient(135deg,var(--card),var(--elev));border:1px solid var(--gold);border-radius:14px;padding:18px;margin:16px 0;box-shadow:0 0 24px rgba(212,168,83,.08)}
+.now-label{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.now-name{font-family:Georgia,serif;font-size:1.05rem;color:var(--gold);margin-bottom:4px}
+.now-song{font-size:1.25rem;font-weight:600}
+.now-artist{color:var(--mut);font-size:.95rem;min-height:1.4em}
+.now.empty .now-song{font-weight:400;color:var(--mut);font-size:1rem}
+.search{position:relative;margin:20px 0 10px;scroll-margin-top:64px}
+.search input{width:100%;padding:14px 16px 14px 42px;font-size:16px;background:var(--card);border:1px solid var(--bd2);border-radius:50px;color:var(--tx);outline:none;transition:border-color .2s}
+.search input:focus{border-color:var(--gold)}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--dim)}
+.hint{font-size:.8rem;color:var(--dim);margin:0 0 12px 6px}
+.results{border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:var(--card);margin-bottom:20px;max-height:52vh;overflow-y:auto}
+.results:empty{display:none}
+.res{padding:12px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
+.res:last-child{border-bottom:none}
+.res:active{background:var(--gold-soft)}
+.res b{display:block;font-size:.95rem;font-weight:600}
+.res span{font-size:.82rem;color:var(--mut)}
+.sec-title{font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin:26px 0 10px;display:flex;justify-content:space-between;align-items:center}
+.q{border:1px solid var(--bd);border-radius:12px;background:var(--card);overflow:hidden}
+.q-item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bd)}
+.q-item:last-child{border-bottom:none}
+.q-pos{width:26px;height:26px;border-radius:50%;background:var(--elev);color:var(--mut);font-size:.8rem;display:flex;align-items:center;justify-content:center;flex:none}
+.q-info{min-width:0;flex:1}
+.q-name{font-size:.92rem;font-weight:600}
+.q-song{font-size:.82rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-item.me{background:var(--gold-soft);border-left:3px solid var(--gold)}
+.q-item.me .q-name{color:var(--gold)}
+.me-tag{font-size:.7rem;background:var(--gold);color:var(--bg);border-radius:50px;padding:2px 8px;flex:none;font-weight:600}
+.q-empty{padding:22px;text-align:center;color:var(--dim);font-size:.88rem}
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+.mask.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--card);border-top:2px solid var(--gold);border-radius:20px 20px 0 0;padding:20px 20px 28px;transform:translateY(110%);transition:transform .3s;max-width:640px;margin:0 auto}
+.sheet.show{transform:translateY(0)}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.sheet-x{background:none;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;line-height:1}
+.sheet-song{font-family:Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--gold)}
+.sheet-artist{font-size:.9rem;color:var(--mut)}
+.sheet label{display:block;font-size:.8rem;color:var(--mut);margin:0 0 6px 2px}
+.sheet input{width:100%;padding:14px 16px;font-size:16px;background:var(--bg);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);outline:none;transition:border-color .2s}
+.sheet input:focus{border-color:var(--gold)}
+.count{font-size:.72rem;color:var(--dim);text-align:right;margin-top:4px}
+.btn-go{width:100%;margin-top:16px;padding:15px;border:none;border-radius:50px;background:var(--gold);color:#0f0f0f;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-go:hover{background:var(--gold-h)}
+.btn-go:disabled{opacity:.4;cursor:not-allowed}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bd2);border-radius:50px;padding:12px 24px;font-size:.9rem;z-index:99;opacity:0;transition:all .3s;pointer-events:none;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.err{border-color:var(--rd);color:var(--rd)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo" id="logoName">Karaokê <span>do Bulla</span></div>
+  <div class="badge"><span class="dot" id="dot"></span><span id="conn">conectando…</span></div>
+</header>
+<div class="wrap">
+  <div class="closed" id="closed"><b>Inscrições fechadas</b><br>Um instante — o palco está em preparo. 🎸</div>
+  <section class="now empty" id="now">
+    <div class="now-label">🎤 Cantando agora</div>
+    <div class="now-name" id="nowName"></div>
+    <div class="now-song" id="nowSong">O palco está livre — escolha sua música!</div>
+    <div class="now-artist" id="nowArtist"></div>
+  </section>
+  <div class="search" id="searchBox">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" id="q" placeholder="Buscar música ou artista…" autocomplete="off">
+  </div>
+  <p class="hint" id="hint">Digite para buscar entre <span id="catCount">…</span> músicas.</p>
+  <div class="results" id="results"></div>
+  <h2 class="sec-title"><span>🎶 Fila</span><span id="qCount"></span></h2>
+  <div class="q" id="queue"><div class="q-empty">Ninguém na fila ainda — seja o primeiro!</div></div>
+</div>
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-head">
+    <div><div class="sheet-song" id="shSong"></div><div class="sheet-artist" id="shArtist"></div></div>
+    <button class="sheet-x" id="shX" aria-label="Fechar">✕</button>
+  </div>
+  <label for="shName">Seu nome ou apelido (é assim que eu chamo no palco)</label>
+  <input type="text" id="shName" maxlength="40" placeholder="Ex.: Ana, Tio Zé, galera da mesa 3…">
+  <div class="count" id="shCount">0/40</div>
+  <button class="btn-go" id="shGo">Quero cantar! 🎤</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+const $=(id)=>document.getElementById(id);
+const norm=(s)=>String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+const cleanName=(s)=>String(s==null?'':s).replace(/[\u0000-\u001f\u007f]/g,' ').replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,40);
+let toastTimer=null;
+function toast(msg,type){const el=$('toast');el.textContent=msg;el.className='toast show '+(type||'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.className='toast';},3200);}
+function myName(){return localStorage.getItem('karaokeNome')||'';}
+let catalog=[];
+let state={open:true,current:null,fila:[]};
+let chosen=null;
+let deb=null;
+let wasSearching=false;
+function paintBrand(){
+  const n=state.eventName||'Karaokê do Bulla';
+  document.title=n;
+  const i=n.indexOf(' ');
+  $('logoName').innerHTML=esc(i>0?n.slice(0,i):n)+(i>0?' <span>'+esc(n.slice(i+1))+'</span>':'');
+}
+function render(){
+  paintBrand();
+  $('closed').classList.toggle('show',!state.open);
+  const c=state.current;
+  if(c){
+    $('now').classList.remove('empty');
+    $('nowName').textContent='🎤 '+c.name;
+    $('nowSong').textContent=c.t;
+    $('nowArtist').textContent=c.a||'';
+  }else{
+    $('now').classList.add('empty');
+    $('nowName').textContent='';
+    $('nowSong').textContent='O palco está livre — escolha sua música!';
+    $('nowArtist').textContent='';
+  }
+  const fila=state.fila||[];
+  $('qCount').textContent=fila.length?('esperando: '+fila.length):'';
+  const my=norm(myName());
+  if(!fila.length){
+    $('queue').innerHTML='<div class="q-empty">Ninguém na fila ainda — seja o primeiro!</div>';
+  }else{
+    $('queue').innerHTML=fila.map((it,i)=>{
+      const me=my&&norm(it.name)===my;
+      return '<div class="q-item'+(me?' me':'')+'">'
+        +'<div class="q-pos">'+(i+1)+'</div>'
+        +'<div class="q-info"><div class="q-name">'+esc(it.name)+'</div>'
+        +'<div class="q-song">'+esc(it.t)+(it.a?' — '+esc(it.a):'')+'</div></div>'
+        +(me?'<div class="me-tag">É VOCÊ ✨</div>':'')
+        +'</div>';
+    }).join('');
+  }
+}
+function renderResults(){
+  const term=norm($('q').value.trim());
+  const box=$('results');
+  const searching=term.length>0;
+  /* Enquanto busca, "Cantando agora" sai da frente: a busca é a prioridade */
+  $('now').style.display=searching?'none':'';
+  /* Ao começar a digitar, sobe a busca para logo abaixo do topo (uma vez só) */
+  if(searching&&!wasSearching){
+    $('searchBox').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  wasSearching=searching;
+  if(!term){box.innerHTML='';return;}
+  /* Busca por palavras: TODOS os termos precisam bater (ex.: "djavan sina") */
+  const words=term.split(/\s+/).filter(Boolean);
+  const all=catalog.filter((s)=>words.every((w)=>s.x.indexOf(w)!==-1));
+  const hits=all.slice(0,60);
+  if(!hits.length){
+    box.innerHTML='<div class="res" style="cursor:default"><b>Nada encontrado</b><span>Tente outro trecho do nome ou do artista.</span></div>';
+    return;
+  }
+  box.innerHTML=hits.map((s)=>'<div class="res" data-id="'+s.id+'"><b>'+esc(s.t)+'</b><span>'+esc(s.a||'—')+'</span></div>').join('');
+  if(all.length>hits.length){
+    box.innerHTML+='<div class="res" style="cursor:default"><span>Mais '+(all.length-hits.length)+' resultado(s) — refine a busca…</span></div>';
+  }
+}
+function openSheet(s){
+  chosen=s;
+  $('shSong').textContent=s.t;
+  $('shArtist').textContent=s.a||'';
+  shName.value=myName();
+  updCount();
+  $('mask').classList.add('show');
+  $('sheet').classList.add('show');
+  setTimeout(()=>shName.focus(),250);
+}
+function closeSheet(){
+  $('mask').classList.remove('show');
+  $('sheet').classList.remove('show');
+  chosen=null;
+}
+function updCount(){ $('shCount').textContent=shName.value.length+'/40'; }
+function send(){
+  if(!chosen) return;
+  if(!state.open){toast('As inscrições estão fechadas.','err');return;}
+  const name=cleanName(shName.value);
+  if(!name){toast('Digite seu nome ou apelido.','err');shName.focus();return;}
+  $('shGo').disabled=true;
+  // Salva o nome ANTES do POST: o servidor avisa a fila por SSE antes de
+  // responder este pedido — salvando depois, o "É VOCÊ ✨" sai atrasado ou não sai.
+  localStorage.setItem('karaokeNome',name);
+  fetch('/api/req',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({songId:chosen.id,name:name})})
+    .then((r)=>r.json())
+    .then((r)=>{
+      if(r.ok){
+        render();
+        toast('Pedido enviado! 🎶','ok');
+        $('q').value='';
+        renderResults();
+        closeSheet();
+        window.scrollTo({top:0,behavior:'smooth'});
+      }else{
+        toast(r.msg||'Não foi possível pedir agora.','err');
+      }
+    })
+    .catch(()=>toast('Falha de conexão com o servidor.','err'))
+    .finally(()=>{$('shGo').disabled=false;});
+}
+const shName=$('shName');
+$('q').addEventListener('input',()=>{clearTimeout(deb);deb=setTimeout(renderResults,150);});
+$('results').addEventListener('click',(e)=>{
+  const el=e.target.closest('.res[data-id]');
+  if(!el) return;
+  const s=catalog.find((x)=>x.id===el.getAttribute('data-id'));
+  if(s) openSheet(s);
+});
+$('shX').addEventListener('click',closeSheet);
+$('mask').addEventListener('click',closeSheet);
+shName.addEventListener('input',updCount);
+shName.addEventListener('keydown',(e)=>{if(e.key==='Enter') send();});
+$('shGo').addEventListener('click',send);
+/* Toque fora do campo de busca (e fora dos resultados) retrai o teclado */
+document.addEventListener('pointerdown',(e)=>{
+  if(e.target.closest('#searchBox')||e.target.closest('#results')) return;
+  if(document.activeElement===$('q')) $('q').blur();
+});
+fetch('/api/catalogo').then((r)=>r.json()).then((c)=>{catalog=c||[];$('catCount').textContent=catalog.length;}).catch(()=>{$('catCount').textContent='?';});
+fetch('/state').then((r)=>r.json()).then((s)=>{state=s;render();}).catch(()=>{});
+const es=new EventSource('/events');
+es.onmessage=(e)=>{
+  try{
+    state=JSON.parse(e.data);
+    render();
+    $('dot').classList.remove('off');
+    $('conn').textContent='ao vivo';
+  }catch(err){/* pacote inválido: ignora */}
+};
+es.onerror=()=>{
+  $('dot').classList.add('off');
+  $('conn').textContent='reconectando…';
+};
+</script>
+</body>
+</html>
