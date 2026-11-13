@@ -66,7 +66,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .act.del:hover{border-color:var(--rd);color:var(--rd)}
 .act.back{width:auto;padding:0 10px;font-size:.72rem;font-weight:600;letter-spacing:.5px;display:inline-flex;flex:none}
 .act.back:hover{border-color:var(--gold);color:var(--gold)}
-.empty{padding:22px;text-align:center;color:var(--dim);font-size:.88rem}
+.q-item.onstage{background:var(--gold-soft)}
+.onstage .q-pos{background:var(--gold);color:#141414}
+.onstage-tag{font-size:.7rem;font-weight:600;color:var(--gold);letter-spacing:.5px}
 .h-item{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:.88rem}
 .h-item:last-child{border-bottom:none}
 .h-ico{flex:none;font-size:1rem}
@@ -181,10 +183,18 @@ function render(){
   $('rodSub').textContent=state.rodizio?'Quem cantou menos vai primeiro':'Ordem de chegada';
   const fila=state.fila||[];
   $('qCount').textContent=fila.length?('· '+fila.length+' aguardando'):'';
-  if(!fila.length){
-    $('queue').innerHTML='<div class="empty">Ninguém na fila ainda.</div>';
-  }else{
-    $('queue').innerHTML=fila.map((it,i)=>{
+  let qhtml='';
+  if(state.current){
+    qhtml+='<div class="q-item onstage">'
+      +'<div class="q-pos">🎤</div>'
+      +'<div class="q-info"><div class="q-name">'+esc(state.current.name)+' <span class="onstage-tag">no palco</span></div>'
+      +'<div class="q-song">'+esc(state.current.t)+(state.current.a?' — '+esc(state.current.a):'')+'</div></div>'
+      +'<div class="q-actions">'
+      +'<button class="act" data-op="move" data-dir="-1" data-id="'+esc(state.current.itemId)+'" title="Subir" disabled>↑</button>'
+      +'<button class="act" data-op="move" data-dir="1" data-id="'+esc(state.current.itemId)+'" title="Descer para a fila">↓</button>'
+      +'</div></div>';
+  }
+  qhtml+=fila.map((it,i)=>{
       return '<div class="q-item">'
         +'<div class="q-pos">'+(i+1)+'</div>'
         +'<div class="q-info"><div class="q-name">'+esc(it.name)+'</div>'
@@ -196,7 +206,7 @@ function render(){
         +'<button class="act del" data-op="remove" data-id="'+esc(it.itemId)+'" title="Remover pedido">✕</button>'
         +'</div></div>';
     }).join('');
-  }
+  $('queue').innerHTML=qhtml||'<div class="empty">Ninguém na fila ainda.</div>';
   const hist=(state.hist||[]).slice().reverse().slice(0,20);
   if(!hist.length){
     $('hist').innerHTML='<div class="empty">As performances aparecem aqui.</div>';
