@@ -380,6 +380,44 @@ function adminAction(b) {
       if (!state.current) return { ok: false, msg: 'Ninguém está cantando agora.' };
       finishCurrent('pulou');
       break;
+    case 'back': {
+      const idx = (typeof b.idx === 'number') ? b.idx : parseInt(b.idx, 10);
+      if (!Number.isInteger(idx) || idx < 0 || idx >= state.hist.length) {
+        return { ok: false, msg: 'Registro não encontrado no histórico.' };
+      }
+      const h = state.hist[idx];
+      if (h.status !== 'pulou') {
+        return { ok: false, msg: 'Só dá para devolver quem pulou a vez.' };
+      }
+      if (countActive(h.name) > 0) {
+        return { ok: false, msg: h.name + ' já está na fila ou no palco.' };
+      }
+      const song =
+        catalog.find((ct) => norm(ct.t) === norm(h.t) && norm(ct.a || '') === norm(h.a || '')) ||
+        catalog.find((ct) => norm(ct.t) === norm(h.t));
+      if (!song) return { ok: false, msg: 'A música não está mais no catálogo.' };
+      // O pulo contava no rodízio: estorna o ponto para não cobrar 2x
+      perfCounts[norm(h.name)] = Math.max(0, (perfCounts[norm(h.name)] || 0) - 1);
+      const item = {
+        itemId: newItemId(),
+        songId: song.id,
+        t: song.t,
+        a: song.a,
+        name: h.name,
+        addedAt: Date.now(),
+        perf: livePerf(h.name)
+      };
+      if (state.rodizio) {
+        // Menos apresentações canta primeiro; empate = ordem de chegada
+        const pos = state.fila.findIndex((i) => livePerf(i.name) > item.perf);
+        if (pos === -1) state.fila.push(item);
+        else state.fila.splice(pos, 0, item);
+      } else {
+        state.fila.push(item);
+      }
+      state.hist.splice(idx, 1);
+      break;
+    }
     case 'remove': {
       const i = state.fila.findIndex((x) => x.itemId === b.id);
       if (i === -1) return { ok: false, msg: 'Esse pedido não está mais na fila.' };
