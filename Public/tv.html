@@ -114,7 +114,7 @@ let state={current:null,fila:[]};
 function rectOf(el){
   if(!el)return null;
   const r=el.getBoundingClientRect();
-  return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,w:r.width};
+  return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,w:r.width,h:r.height};
 }
 function paintArrows(){
   const L=$('pArrL'),R=$('pArrR');
@@ -124,14 +124,17 @@ function paintArrows(){
   if(!f||!f.w)f=rectOf($('wifiName'));
   if(!f||!f.w)f=rectOf($('wifiOff'));
   if(!w||!w.w||!m||!m.w||!q||!q.w||!f||!f.w)return;
-  /* Esquerda: da palavra Wi-Fi até a senha no rodapé */
+  /* Esquerda: da palavra Wi-Fi até logo ACIMA da linha do rodapé, apontando para a senha */
+  const foot=rectOf(document.querySelector('.foot'));
+  if(!foot||!foot.w)return;
+  const ex=f.left+f.w*.8, ey=foot.top-10;
   L.setAttribute('d','M'+(w.left+w.w*.35)+','+(w.bottom+4)
-    +' Q'+(w.left+(f.left-w.left)*.1)+','+(w.bottom+(f.top-w.bottom)*.55)
-    +' '+(f.left+2)+','+(f.top-4));
-  /* Direita: da palavra música até o canto inferior direito do QR */
+    +' Q'+(ex+Math.max(56,f.w*.9))+','+(ey-70)
+    +' '+ex+','+ey);
+  /* Direita: da palavra música até a LATERAL direita do QR, no meio da altura */
   R.setAttribute('d','M'+m.right+','+(m.top-4)
-    +' Q'+(m.right+26)+','+(m.top+(q.bottom-m.top)*.5)
-    +' '+(q.right-q.w*.18)+','+(q.bottom+4));
+    +' Q'+(q.right+q.h*.28)+','+(q.top+q.h*.5-24)
+    +' '+(q.right+8)+','+(q.top+q.h*.5));
 }
 (function arrowsTick(){
   paintArrows();
