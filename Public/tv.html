@@ -95,8 +95,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
         <path d="M1,1 L11,6 L1,11" fill="none" stroke="#d4a853" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </marker>
     </defs>
-    <path id="pArrL" fill="none" stroke="#d4a853" stroke-width="4" stroke-linecap="round" marker-end="url(#paTip)"/>
-    <path id="pArrR" fill="none" stroke="#d4a853" stroke-width="4" stroke-linecap="round" marker-end="url(#paTip)"/>
+    <path id="pArrL" fill="none" stroke="#d4a853" stroke-width="8" stroke-linecap="round" marker-end="url(#paTip)"/>
+    <path id="pArrR" fill="none" stroke="#d4a853" stroke-width="8" stroke-linecap="round" marker-end="url(#paTip)"/>
   </svg>
 </section>
 <footer class="foot">
@@ -124,17 +124,20 @@ function paintArrows(){
   if(!f||!f.w)f=rectOf($('wifiName'));
   if(!f||!f.w)f=rectOf($('wifiOff'));
   if(!w||!w.w||!m||!m.w||!q||!q.w||!f||!f.w)return;
-  /* Esquerda: da palavra Wi-Fi até logo ACIMA da linha do rodapé, apontando para a senha */
+  /* Esquerda: da palavra Wi-Fi até logo ACIMA da linha do rodapé, apontando para a senha (arco de curvatura constante) */
   const foot=rectOf(document.querySelector('.foot'));
   if(!foot||!foot.w)return;
   const ex=f.left+f.w*.8, ey=foot.top-10;
-  L.setAttribute('d','M'+(w.left+w.w*.35)+','+(w.bottom+4)
-    +' Q'+(ex+Math.max(56,f.w*.9))+','+(ey-70)
-    +' '+ex+','+ey);
-  /* Direita: da palavra música até a LATERAL direita do QR, no meio da altura */
-  R.setAttribute('d','M'+m.right+','+(m.top-4)
-    +' Q'+(q.right+q.h*.28)+','+(q.top+q.h*.5-24)
-    +' '+(q.right+8)+','+(q.top+q.h*.5));
+  const lsx=w.left+w.w*.35, lsy=w.bottom+4;
+  const lc=Math.hypot(ex-lsx,ey-lsy), lr=lc*2.2;
+  L.setAttribute('d','M'+lsx+','+lsy
+    +' A'+lr+','+lr+' 0 0 0 '+ex+','+ey);
+  /* Direita: da palavra música até a LATERAL direita do QR, no meio da altura, com respiro (arco de curvatura constante) */
+  const rsx=m.right, rsy=m.top-4;
+  const rex=q.right+30, rey=q.top+q.h*.5;
+  const rc=Math.hypot(rex-rsx,rey-rsy), rr=rc*.7;
+  R.setAttribute('d','M'+rsx+','+rsy
+    +' A'+rr+','+rr+' 0 0 0 '+rex+','+rey);
 }
 (function arrowsTick(){
   paintArrows();
