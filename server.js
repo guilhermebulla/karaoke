@@ -360,12 +360,13 @@ function adminAction(b) {
       if (state.rodizio) reSortQueue();
       break;
     case 'start': {
-      if (state.current) {
-        return { ok: false, msg: 'Alguém já está cantando — encerre antes de chamar outro.' };
-      }
       const i = state.fila.findIndex((x) => x.itemId === b.id);
       if (i === -1) return { ok: false, msg: 'Esse pedido não está mais na fila.' };
       const it = state.fila.splice(i, 1)[0];
+      if (state.current) {
+        // Palco ocupado: quem estava cantando volta para a posição 1 da fila
+        state.fila.unshift(state.current);
+      }
       state.current = {
         itemId: it.itemId, songId: it.songId, t: it.t, a: it.a,
         name: it.name, startedAt: Date.now()
