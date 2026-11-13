@@ -40,12 +40,15 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .qr-hint{position:absolute;bottom:calc(100% + 12px);right:0;background:var(--gold-soft);border:1px solid var(--gold);color:var(--tx);border-radius:50px;padding:8px 18px;font-size:clamp(.8rem,1.4vw,1.05rem);white-space:nowrap;pointer-events:none}
 .qr-fail{color:var(--rd);font-size:clamp(.75rem,1.3vw,1rem);text-align:center;max-width:16vw}
 .poster{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:0;position:relative}
-.poster .eyebrow{position:absolute;top:1vh;left:50%;transform:translateX(-50%);font-size:clamp(1.1rem,2.4vw,2rem)}
+.poster .eyebrow{position:absolute;top:1vh;left:50%;transform:translateX(-50%);font-size:clamp(1.4rem,2.8vw,2.6rem)}
 .poster.show{display:flex}
 .poster canvas{height:42vh;width:auto;max-width:56vw;border-radius:10px;box-shadow:0 0 40px rgba(212,168,83,.15)}
-.poster-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.5rem,3.4vw,2.8rem);color:var(--gold);margin-top:2vh}
-.poster-wifi{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1rem,2.2vw,1.7rem);color:var(--mut);margin-bottom:2vh;background:none;border:none;border-radius:0;padding:0}
-.poster-wifi b{color:var(--gold);font-weight:700;word-break:break-word}
+.poster-qr{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%)}
+.p-arrow{position:absolute;width:9vw;height:9vw;opacity:.55;pointer-events:none}
+.p-arrow-r{right:-11vw;bottom:-4vh}
+.p-arrow-l{left:-11vw;bottom:-26vh;width:14vw;height:14vw}
+.poster-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.5rem,3.4vw,2.8rem);color:var(--gold);position:fixed;top:calc(50% + 24vh);left:50%;transform:translateX(-50%);margin-top:0}
+.poster .divider{position:fixed;top:calc(50% + 32vh);left:50%;transform:translateX(-50%);margin:2vh 0 0}
 .foot{flex:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:1.4vh 0;border-top:1px solid var(--bd);font-size:clamp(.8rem,1.4vw,1.05rem);color:var(--mut);margin-top:1.4vh;font-family:Georgia,'Times New Roman',serif}
 .foot b{color:var(--gold);font-weight:700}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);margin-right:6px}
@@ -82,7 +85,25 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 </section>
 <section class="poster" id="poster">
   <div class="eyebrow">Palco livre</div>
-  <div id="qrBig"></div>
+  <div class="poster-qr">
+    <svg class="p-arrow p-arrow-r" viewBox="0 0 200 200" aria-hidden="true">
+      <defs>
+        <marker id="paTipR" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M1,1 L11,6 L1,11" fill="none" stroke="#d4a853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <path d="M182,182 Q158,96 56,44" fill="none" stroke="#d4a853" stroke-width="2.5" stroke-linecap="round" marker-end="url(#paTipR)"/>
+    </svg>
+    <div id="qrBig"></div>
+    <svg class="p-arrow p-arrow-l" viewBox="0 0 200 200" aria-hidden="true">
+      <defs>
+        <marker id="paTipL" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M1,1 L11,6 L1,11" fill="none" stroke="#d4a853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <path d="M182,64 Q160,142 50,170" fill="none" stroke="#d4a853" stroke-width="2" stroke-linecap="round" marker-end="url(#paTipL)"/>
+    </svg>
+  </div>
   <div class="qr-fail" id="qrFailB" hidden>Wi-Fi sem IP — ligue o hotspot do notebook</div>
   <div class="poster-title">Conecte no Wi-Fi e escolha sua música</div>
   <div class="divider"></div>
