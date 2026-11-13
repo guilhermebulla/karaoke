@@ -426,6 +426,13 @@ function adminAction(b) {
     }
     case 'move': {
       const i = state.fila.findIndex((x) => x.itemId === b.id);
+      if (i === -1 && state.current && state.current.itemId === b.id) {
+        // Artista do palco desce para a fila (alteração de última hora)
+        if (b.dir < 0) return { ok: false, msg: 'O palco já está no topo da lista.' };
+        state.fila.unshift(state.current);
+        state.current = null;
+        break;
+      }
       if (i === -1) return { ok: false, msg: 'Esse pedido não está mais na fila.' };
       const j = i + (b.dir < 0 ? -1 : 1);
       if (j >= 0 && j < state.fila.length) {
