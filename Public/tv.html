@@ -17,7 +17,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .tv-name{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:clamp(2.4rem,7.6vw,6.8rem);color:var(--gold);line-height:1.08;word-break:break-word}
 .tv-song{font-size:clamp(1.4rem,3.3vw,2.9rem);font-weight:600;margin-top:1.2vh}
 .tv-artist{font-size:clamp(.95rem,2vw,1.6rem);color:var(--mut);margin-top:.4vh;min-height:1.2em}
-.idle{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.4rem,3.4vw,2.7rem);color:var(--mut)}
 .divider{width:150px;height:2px;margin:2vh auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .band{flex:none;display:flex;gap:1.6vw;align-items:stretch;width:100%;margin-top:1.6vh;min-height:0}
 .qwrap{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:1.3vh 1.4vw}
@@ -56,8 +55,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 <body>
 <div class="tv-logo" id="tvLogo">Karaokê <span>do Bulla</span></div>
 <section class="stage" id="stage">
-  <div class="eyebrow" id="eyebrow">🎤 Cantando agora</div>
-  <div class="idle" id="idle">O palco está livre — escolha sua música no celular</div>
+  <div class="eyebrow" id="eyebrow">Cantando agora</div>
   <div id="cur" style="display:none">
     <div class="tv-name" id="curName"></div>
     <div class="tv-song" id="curSong"></div>
@@ -74,17 +72,16 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
     </div>
   </div>
   <div class="qrzone">
-    <div class="qr-hint">Aponte a câmera e seja a estrela! ↓</div>
+    <div class="qr-hint">Escolha a sua no celular ↓</div>
     <div id="qrSmall"></div>
     <div class="qr-fail" id="qrFailS" hidden>Wi-Fi sem IP — ligue o hotspot do notebook</div>
   </div>
 </section>
 <section class="poster" id="poster">
   <div class="eyebrow">Palco livre</div>
-  <div class="poster-wifi" id="posterWifi" hidden>Conecte no Wi-Fi <b id="pWifiName"></b><span id="pPassPart" hidden> · senha: <b id="pWifiPass"></b></span></div>
   <div id="qrBig"></div>
   <div class="qr-fail" id="qrFailB" hidden>Wi-Fi sem IP — ligue o hotspot do notebook</div>
-  <div class="poster-title">Aponte a câmera e seja a estrela!</div>
+  <div class="poster-title">Escaneie e escolha sua música</div>
 </section>
 <footer class="foot">
   <span id="wifiInfo" hidden>Wi-Fi: <b id="wifiName">…</b><span id="passPart" hidden> · senha: <b id="wifiPass"></b></span></span>
@@ -220,10 +217,6 @@ function paintWifi(){
   if(nm)$('wifiName').textContent=nm;
   if(pw)$('wifiPass').textContent=pw;
   $('wifiOff').hidden=!!(nm||pw);
-  $('posterWifi').hidden=!nm;
-  $('pPassPart').hidden=!pw;
-  if(nm)$('pWifiName').textContent=nm;
-  if(pw)$('pWifiPass').textContent=pw;
 }
 function render(){
   paintWifi();
@@ -234,15 +227,18 @@ function render(){
   const c=state.current;
   const fila=state.fila||[];
   if(c){
-    $('eyebrow').textContent='🎤 Cantando agora';
-    $('idle').style.display='none';
+    $('eyebrow').textContent='Cantando agora';
     $('cur').style.display='block';
     $('curName').textContent=c.name;
     $('curSong').textContent=c.t;
     $('curArtist').textContent=c.a||'';
+  }else if(fila.length){
+    $('eyebrow').textContent='A seguir';
+    $('cur').style.display='block';
+    $('curName').textContent=fila[0].name;
+    $('curSong').textContent=fila[0].t;
+    $('curArtist').textContent=fila[0].a||'';
   }else{
-    $('eyebrow').textContent='🎤 Escolha sua música no celular';
-    $('idle').style.display='block';
     $('cur').style.display='none';
   }
   if(!c&&!fila.length){
@@ -267,7 +263,7 @@ function render(){
       +'<div class="nx-song">'+esc(it.t)+(it.a?' — '+esc(it.a):'')+'</div>'
       +'</div></div>';
   }
-  $('colA').innerHTML=colA.length?colA.map(itemHTML).join(''):'<div class="nx-empty">A fila está vazia — peça sua música pelo celular</div>';
+  $('colA').innerHTML=colA.length?colA.map(itemHTML).join(''):'<div class="nx-empty">A fila está vazia — escolha a sua no celular</div>';
   $('colB').innerHTML=colB.map((it,i)=>itemHTML(it,i+half)).join('');
   balanceQR();
 }
