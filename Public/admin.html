@@ -64,6 +64,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .act.call{width:auto;padding:0 12px;border-color:var(--gold);color:var(--gold);font-weight:600;font-size:.85rem;gap:4px}
 .act.call:hover{background:var(--gold-soft)}
 .act.del:hover{border-color:var(--rd);color:var(--rd)}
+.act.back{width:auto;padding:0 10px;font-size:.72rem;font-weight:600;letter-spacing:.5px;display:inline-flex;flex:none;margin-left:8px}
+.act.back:hover{border-color:var(--gold);color:var(--gold)}
 .empty{padding:22px;text-align:center;color:var(--dim);font-size:.88rem}
 .h-item{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:.88rem}
 .h-item:last-child{border-bottom:none}
@@ -199,13 +201,16 @@ function render(){
   if(!hist.length){
     $('hist').innerHTML='<div class="empty">As performances aparecem aqui.</div>';
   }else{
-    $('hist').innerHTML=hist.map((h)=>{
+    $('hist').innerHTML=hist.map((h,i)=>{
       const ok=h.status==='concluido';
+      const rawIdx=state.hist.length-1-i;
       return '<div class="h-item'+(ok?'':' pulou')+'">'
         +'<span class="h-ico">'+(ok?'✅':'⏭')+'</span>'
         +'<div class="h-info"><div class="h-name">'+esc(h.name)+(ok?' cantou':' pulou')+'</div>'
         +'<div class="h-song">'+esc(h.t)+(h.a?' — '+esc(h.a):'')+'</div></div>'
-        +'<span class="h-time">'+fmtTime(h.at)+'</span></div>';
+        +'<span class="h-time">'+fmtTime(h.at)+'</span>'
+        +(ok?'':'<button class="act back" data-op="back" data-idx="'+rawIdx+'" data-name="'+esc(h.name)+'" title="Voltar para a fila">Back</button>')
+        +'</div>';
     }).join('');
   }
 }
@@ -221,6 +226,12 @@ $('queue').addEventListener('click',(e)=>{
   }else if(op==='remove'){
     if(confirm('Remover esse pedido da fila?')) act('remove',{id:id});
   }
+});
+$('hist').addEventListener('click',(e)=>{
+  const b=e.target.closest('button[data-op="back"]');
+  if(!b) return;
+  const nm=b.getAttribute('data-name')||'esse convidado';
+  if(confirm('Devolver '+nm+' para a fila de espera?')) act('back',{idx:parseInt(b.getAttribute('data-idx'),10)});
 });
 $('swOpen').addEventListener('change',()=>act('open',{value:$('swOpen').checked}));
 $('swRod').addEventListener('change',()=>act('rodizio',{value:$('swRod').checked}));
