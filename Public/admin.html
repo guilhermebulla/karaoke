@@ -82,7 +82,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:var(--grn);color:var(--grn)}
 .toast.err{border-color:var(--rd);color:var(--rd)}
-@media (max-width:520px){.toggles{grid-template-columns:1fr}.q-actions{flex-direction:column}.act{width:34px;height:32px}.act.call{width:auto;padding:0 10px;height:32px;font-size:.78rem}.act-ghost{width:34px;height:32px}}
+@media (max-width:520px){.toggles{grid-template-columns:1fr}.q-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.act{width:34px;height:32px}.act.call{width:auto;padding:0 10px;height:32px;font-size:.78rem;grid-column:1/-1}.q-actions .act.del{width:auto;height:32px;padding:0 10px;font-size:.78rem;grid-column:1/-1;border-color:var(--rd);color:var(--rd)}.onstage .q-actions .act{grid-column:1/-1;justify-self:end}.act-ghost{width:34px;height:32px}}
 </style>
 </head>
 <body>
