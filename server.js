@@ -330,7 +330,6 @@ function finishCurrent(status) {
   state.hist.push({ t: cur.t, a: cur.a, name: cur.name, status: status, at: Date.now() });
   if (state.hist.length > HIST_MAX) state.hist = state.hist.slice(-HIST_MAX);
   state.current = null;
-  startNext();
 }
 
 function adminAction(b) {
