@@ -37,6 +37,10 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .scr-ico{font-size:1.6rem}
 .scr-name{font-size:.92rem;font-weight:600;margin-top:6px}
 .scr-sub{font-size:.72rem;color:var(--dim);margin-top:2px}
+.scr-qr{margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.scr-qr-box{width:96px;display:flex;align-items:center;justify-content:center}
+.scr-qr-box canvas{width:96px;height:auto;border-radius:6px;box-shadow:0 0 14px rgba(212,168,83,.14)}
+.scr-qr-cap{font-size:.66rem;color:var(--dim);letter-spacing:.3px}
 .screens-note{font-size:.72rem;color:var(--dim);text-align:center}
 .help{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin-top:16px}
 .help-title{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
@@ -90,7 +94,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 
   <div class="screens">
     <div class="scr" id="goGuest"><div class="scr-ico">👥</div><div class="scr-name">Convidado</div><div class="scr-sub">fila em tempo real</div></div>
-    <div class="scr" id="goAdmin"><div class="scr-ico">🎛️</div><div class="scr-name">Painel do artista</div><div class="scr-sub">controlar a fila</div></div>
+    <div class="scr" id="goAdmin"><div class="scr-ico">🎛️</div><div class="scr-name">Painel do artista</div><div class="scr-sub">controlar a fila</div><div class="scr-qr" id="adminQrWrap" hidden><div class="scr-qr-box" id="adminQr"></div><div class="scr-qr-cap">escaneie com o celular</div></div></div>
     <div class="scr" id="goTv"><div class="scr-ico">📺</div><div class="scr-name">Telão</div><div class="scr-sub">tela da TV/HDMI</div></div>
   </div>
   <p class="screens-note">Painel e telão abrem no próprio notebook · Convidado abre como quem está no Wi-Fi.</p>
@@ -113,6 +117,86 @@ let toastTimer=null;
 function toast(msg){const el=$('toast');el.textContent=msg;el.className='toast show';clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.className='toast';},2600);}
 let guestUrl='';
 let localBase='http://localhost:8080';
+
+/* ---------- QR em JavaScript puro — zero dependência, offline ---------- */
+function qrMatrix(text){
+  const EXP=new Uint8Array(512),LOG=new Uint8Array(256);
+  (function(){let x=1;for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&256)x^=0x11d;}for(let i=255;i<512;i++)EXP[i]=EXP[i-255];})();
+  const gmul=(a,b)=>{if(!a||!b)return 0;return EXP[LOG[a]+LOG[b]];};
+  function rsGen(n){let g=[1];for(let i=0;i<n;i++){const r=new Array(g.length+1).fill(0);for(let j=0;j<g.length;j++){r[j]^=g[j];r[j+1]^=gmul(g[j],EXP[i]);}g=r;}return g;}
+  function rsRem(data,ecLen){const g=rsGen(ecLen);const res=data.concat(new Array(ecLen).fill(0));for(let i=0;i<data.length;i++){const k=res[i];if(k)for(let j=1;j<g.length;j++)res[i+j]^=gmul(g[j],k);}return res.slice(data.length);}
+  const utf8=[];
+  for(let i=0;i<text.length;i++){
+    let c=text.codePointAt(i);
+    if(c>0xFFFF)i++;
+    if(c<0x80)utf8.push(c);
+    else if(c<0x800)utf8.push(0xC0|(c>>6),0x80|(c&63));
+    else if(c<0x10000)utf8.push(0xE0|(c>>12),0x80|((c>>6)&63),0x80|(c&63));
+    else utf8.push(0xF0|(c>>18),0x80|((c>>12)&63),0x80|((c>>6)&63),0x80|(c&63));
+  }
+  if(utf8.length>134)throw new Error('texto longo demais para o QR');
+  const bits=[];
+  const put=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>i)&1);};
+  put(4,4);put(utf8.length,8);
+  utf8.forEach((c)=>put(c,8));
+  while(bits.length%8)bits.push(0);
+  const data=[];
+  for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b);}
+  const pad=[0xEC,0x11];let pi=0;
+  while(data.length<136)data.push(pad[pi++&1]);
+  const blocks=[data.slice(0,68),data.slice(68,136)];
+  const ecs=[rsRem(blocks[0],18),rsRem(blocks[1],18)];
+  const final=[];
+  for(let i=0;i<68;i++){final.push(blocks[0][i],blocks[1][i]);}
+  for(let i=0;i<18;i++){final.push(ecs[0][i],ecs[1][i]);}
+  const N=41,m=Array.from({length:N},()=>new Array(N).fill(null));
+  function setFinder(r,c){for(let i=-1;i<=7;i++)for(let j=-1;j<=7;j++){const rr=r+i,cc=c+j;if(rr<0||rr>=N||cc<0||cc>=N)continue;m[rr][cc]=(i>=0&&i<=6&&j>=0&&j<=6&&(i===0||i===6||j===0||j===6))||(i>=2&&i<=4&&j>=2&&j<=4);}}
+  setFinder(0,0);setFinder(0,N-7);setFinder(N-7,0);
+  for(let i=8;i<N-8;i++){if(m[6][i]===null)m[6][i]=(i%2===0);if(m[i][6]===null)m[i][6]=(i%2===0);}
+  for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)m[34+i][34+j]=(Math.abs(i)===2||Math.abs(j)===2||(i===0&&j===0));
+  for(let i=0;i<=8;i++){if(m[8][i]===null)m[8][i]=false;if(m[i][8]===null)m[i][8]=false;}
+  for(let i=N-8;i<N;i++){if(m[8][i]===null)m[8][i]=false;if(m[i][8]===null)m[i][8]=false;}
+  const FB=[1,1,1,0,1,1,1,1,1,0,0,0,1,0,0]; /* formato: nivel L + mascara 0 */
+  for(let i=0;i<=5;i++)m[8][i]=FB[i];
+  m[8][7]=FB[6];m[8][8]=FB[7];m[7][8]=FB[8];
+  for(let i=9;i<15;i++)m[14-i][8]=FB[i];
+  for(let i=0;i<8;i++)m[N-1-i][8]=FB[i];
+  for(let i=8;i<15;i++)m[8][N-15+i]=FB[i];
+  m[N-8][8]=true;
+  const maskF=(i,j)=>((i+j)&1)===0;
+  let up=true,bi=0;const totalBits=final.length*8;
+  for(let c=N-1;c>0;c-=2){
+    if(c===6)c--;
+    for(let t=0;t<N;t++){
+      const r=up?(N-1-t):t;
+      for(let k=0;k<2;k++){
+        const cc=c-k;
+        if(m[r][cc]!==null)continue;
+        let v=false;
+        if(bi<totalBits)v=((final[bi>>3]>>(7-(bi&7)))&1)===1;
+        bi++;
+        if(maskF(r,cc))v=!v;
+        m[r][cc]=v;
+      }
+    }
+    up=!up;
+  }
+  return m;
+}
+function drawQR(el,text){
+  try{
+    const mtx=qrMatrix(text);
+    const s=8,q=4,n=(mtx.length+q*2)*s;
+    const cv=document.createElement('canvas');
+    cv.width=n;cv.height=n;
+    const g=cv.getContext('2d');
+    g.fillStyle='#f7f1e3';g.fillRect(0,0,n,n);
+    g.fillStyle='#141414';
+    for(let r=0;r<mtx.length;r++)for(let c=0;c<mtx.length;c++)if(mtx[r][c])g.fillRect((c+4)*s,(r+4)*s,s,s);
+    el.innerHTML='';el.appendChild(cv);
+    return true;
+  }catch(e){return false;}
+}
 function loadHost(){
   fetch('/api/host').then((r)=>r.json()).then((h)=>{
     const ips=(h&&h.ips)||[];
@@ -121,6 +205,9 @@ function loadHost(){
     ips.sort((a,b)=>((b.indexOf('192.168.137.')===0)-(a.indexOf('192.168.137.')===0)));
     const ip=ips[0]||'';
     guestUrl=ip?('http://'+ip+':'+port):'';
+    // QR do painel do artista: abre o admin no celular/tablet do artista
+    const okQr=ip && drawQR($('adminQr'), guestUrl+'/admin.html');
+    $('adminQrWrap').hidden=!okQr;
     // No notebook usa localhost; aberto pelo celular, usa o próprio endereço desta página
     const host=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'localhost':location.hostname;
     localBase='http://'+host+':'+port;
