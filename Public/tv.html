@@ -61,9 +61,9 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 /* Focos de luz de palco: só no estado "Cantando agora"; feixes convergindo abaixo da linha dourada */
 .spotlights{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;display:none}
 .stage:not(.next) .spotlights{display:block}
-.beam{position:absolute;top:-6vh;width:15vw;height:84vh;background:linear-gradient(180deg,rgba(212,168,83,.9),rgba(212,168,83,.4) 45%,rgba(212,168,83,0) 82%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);filter:blur(24px);opacity:.16}
-.beam.l{left:12vw;transform-origin:top center;transform:rotate(26deg)}
-.beam.r{right:12vw;transform-origin:top center;transform:rotate(-26deg)}
+.beam{position:absolute;top:-6vh;width:11vw;height:84vh;background:linear-gradient(180deg,rgba(212,168,83,.9),rgba(212,168,83,.4) 45%,rgba(212,168,83,0) 82%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);filter:blur(24px);opacity:.16}
+.beam.l{left:12vw;transform-origin:top center;transform:rotate(-26deg)}
+.beam.r{right:12vw;transform-origin:top center;transform:rotate(26deg)}
 @media (max-width:700px){.band{flex-direction:column}.qr-hint{position:static;margin-bottom:6px}#qrSmall{height:14vh;min-height:0}.poster canvas{height:34vh;max-width:80vw}.qr-fail{max-width:60vw}}
 </style>
 </head>
@@ -163,6 +163,22 @@ function paintArrows(){
   if(m&&f)m.style.bottom=f.offsetHeight+'px';
   if(m&&q)q.style.marginLeft=(m.offsetWidth+Math.round(innerWidth*.016))+'px';
   requestAnimationFrame(mascotFit);
+})();
+
+/* Focos: convergem para um ponto abaixo da linha dourada (V aberto, sem se tocar) */
+(function spotFit(){
+  const s=document.querySelector('.spotlights'), d=document.querySelector('#stage .divider');
+  if(s&&d){
+    const T={x:innerWidth/2, y:d.getBoundingClientRect().bottom+innerHeight*.10};
+    [[s.querySelector('.beam.l'),.175],[s.querySelector('.beam.r'),.825]].forEach(([b,ax])=>{
+      if(!b)return;
+      const xA=ax*innerWidth, yA=innerHeight*-.06;
+      const vx=T.x-xA, vy=T.y-yA, len=Math.hypot(vx,vy);
+      b.style.height=Math.round(len*.92)+'px';
+      b.style.transform='rotate('+(Math.atan2(-vx/len, vy/len)*180/Math.PI).toFixed(2)+'deg)';
+    });
+  }
+  requestAnimationFrame(spotFit);
 })();
 /* Respiro simétrico: espaçamento de baixo da lista = o de cima; QR acompanha a altura do box.
    O QR é zerado ANTES da medição — senão ele sustenta a altura do box e nada muda. */
