@@ -79,6 +79,10 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .q-letra{margin-left:auto;align-self:center;flex-shrink:0;background:transparent;border:1.5px solid var(--gold);border-radius:50px;color:var(--gold);font-size:.72rem;font-weight:600;letter-spacing:.5px;padding:6px 14px;cursor:pointer}
 .q-letra:active{background:var(--gold-soft)}
 .now-letra{margin-top:16px}
+.btn-letra.sem-letra,.q-letra.sem-letra{border-color:var(--bd2);color:var(--dim);cursor:not-allowed}
+.btn-letra.sem-letra:active,.q-letra.sem-letra:active{background:transparent}
+.letra-tip{position:fixed;z-index:70;left:50%;top:0;transform:translate(-50%,-100%);background:var(--elev);border:1px solid var(--bd2);color:var(--tx);font-size:.78rem;padding:8px 12px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.5);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+.letra-tip.show{opacity:1}
 </style>
 </head>
 <body>
@@ -120,6 +124,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
   <button class="btn-go" id="shGo">Quero cantar! 🎤</button>
 </div>
   <div class="toast" id="toast"></div>
+  <div class="letra-tip" id="letraTip" role="status">Letra ainda não disponível</div>
   <div class="letra-view" id="letraView">
     <div class="letra-bar">
       <button type="button" class="letra-back" id="letraBack">← Voltar</button>
@@ -211,6 +216,7 @@ function openSheet(s){
   chosen=s;
   $('shSong').textContent=s.t;
   $('shArtist').textContent=s.a||'';
+  $('shLetraBtn').classList.toggle('sem-letra',!comLetra.has(s.id));
   shName.value=myName();
   updCount();
   $('mask').classList.add('show');
@@ -271,7 +277,25 @@ function closeLetra(){
   $('letraFrame').src='about:blank';
 }
 $('letraBack').addEventListener('click',closeLetra);
-$('shLetraBtn').addEventListener('click',()=>{if(chosen)openLetra(chosen.id);});
+let letraTipTimer=null;
+function showLetraTip(btn){
+  const tip=$('letraTip');
+  const r=btn.getBoundingClientRect();
+  const below=r.top<56;
+  let x=r.left+r.width/2;
+  x=Math.max(100,Math.min(window.innerWidth-100,x));
+  tip.style.left=x+'px';
+  tip.style.top=(below?r.bottom+10:r.top-10)+'px';
+  tip.style.transform=below?'translate(-50%,0)':'translate(-50%,-100%)';
+  tip.classList.add('show');
+  clearTimeout(letraTipTimer);
+  letraTipTimer=setTimeout(()=>tip.classList.remove('show'),2400);
+}
+$('shLetraBtn').addEventListener('click',()=>{
+  if(!chosen)return;
+  if(!comLetra.has(chosen.id)){showLetraTip($('shLetraBtn'));return;}
+  openLetra(chosen.id);
+});
 $('letraFrame').addEventListener('load',()=>{
   try{
     const d=$('letraFrame').contentDocument;
@@ -281,7 +305,9 @@ $('letraFrame').addEventListener('load',()=>{
 });
 $('queue').addEventListener('click',(e)=>{
   const b=e.target.closest('.q-letra');
-  if(b) openLetra(b.dataset.id);
+  if(!b)return;
+  if(!comLetra.has(b.dataset.id)){showLetraTip(b);return;}
+  openLetra(b.dataset.id);
 });
 /* Toque fora do campo de busca (e fora dos resultados) retrai o teclado */
 document.addEventListener('pointerdown',(e)=>{
@@ -289,6 +315,8 @@ document.addEventListener('pointerdown',(e)=>{
   if(document.activeElement===$('q')) $('q').blur();
 });
 fetch('/api/catalogo').then((r)=>r.json()).then((c)=>{catalog=c||[];$('catCount').textContent=catalog.length;}).catch(()=>{$('catCount').textContent='?';});
+let comLetra=new Set();
+fetch('/api/letras').then((r)=>r.json()).then((ids)=>{comLetra=new Set(ids||[]);render();}).catch(()=>{});
 fetch('/state').then((r)=>r.json()).then((s)=>{state=s;render();}).catch(()=>{});
 const es=new EventSource('/events');
 es.onmessage=(e)=>{
