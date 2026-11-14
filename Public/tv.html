@@ -58,6 +58,12 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .hint.off{opacity:0;pointer-events:none}
 /* Mascote (Karime): decorativa, canto esquerdo, atrás dos boxes; base ancorada via JS */
 .tv-mascot{position:fixed;left:0;bottom:0;height:min(50vh,40vw);width:auto;z-index:-1;pointer-events:none;user-select:none}
+/* Focos de luz de palco: só no estado "Cantando agora"; feixes convergindo abaixo da linha dourada */
+.spotlights{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;display:none}
+.stage:not(.next) .spotlights{display:block}
+.beam{position:absolute;top:-6vh;width:15vw;height:84vh;background:linear-gradient(180deg,rgba(212,168,83,.9),rgba(212,168,83,.4) 45%,rgba(212,168,83,0) 82%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);filter:blur(24px);opacity:.16}
+.beam.l{left:12vw;transform-origin:top center;transform:rotate(26deg)}
+.beam.r{right:12vw;transform-origin:top center;transform:rotate(-26deg)}
 @media (max-width:700px){.band{flex-direction:column}.qr-hint{position:static;margin-bottom:6px}#qrSmall{height:14vh;min-height:0}.poster canvas{height:34vh;max-width:80vw}.qr-fail{max-width:60vw}}
 </style>
 </head>
@@ -72,6 +78,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
     <div class="tv-artist" id="curArtist"></div>
   </div>
   <div class="divider"></div>
+  <div class="spotlights"><div class="beam l"></div><div class="beam r"></div></div>
 </section>
 <section class="band" id="band">
   <div class="qwrap">
