@@ -162,6 +162,7 @@ function render(){
     $('nowArtist').textContent=c.a||'';
     $('nowLetra').style.display='inline-block';
     $('nowLetra').dataset.id=c.songId;
+    $('nowLetra').classList.toggle('sem-letra',!comLetra.has(c.songId));
   }else{
     $('now').classList.add('empty');
     $('nowName').textContent='';
@@ -182,7 +183,7 @@ function render(){
         +'<div class="q-info"><div class="q-name">'+esc(it.name)+'</div>'
         +'<div class="q-song">'+esc(it.t)+(it.a?' — '+esc(it.a):'')+'</div></div>'
         +(me?'<div class="me-tag">É VOCÊ ✨</div>':'')
-        +'<button type="button" class="q-letra" data-id="'+esc(it.songId)+'">Letra</button>'
+        +'<button type="button" class="q-letra'+(comLetra.has(it.songId)?'':' sem-letra')+'" data-id="'+esc(it.songId)+'">Letra</button>'
         +'</div>';
     }).join('');
   }
