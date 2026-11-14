@@ -61,7 +61,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .sheet input{width:100%;padding:14px 16px;font-size:16px;background:var(--bg);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);outline:none;transition:border-color .2s}
 .sheet input:focus{border-color:var(--gold)}
 .count{font-size:.72rem;color:var(--dim);text-align:right;margin-top:4px}
-.sh-letra{display:inline-block;margin-top:12px;color:var(--gold);font-size:1rem;text-decoration:none}
+.btn-letra{width:100%;margin-top:16px;padding:13px;border:1.5px solid var(--gold);border-radius:50px;background:transparent;color:var(--gold);font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s}
+.btn-letra:active{background:var(--gold-soft)}
 .btn-go{width:100%;margin-top:16px;padding:15px;border:none;border-radius:50px;background:var(--gold);color:#0f0f0f;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s}
 .btn-go:hover{background:var(--gold-h)}
 .btn-go:disabled{opacity:.4;cursor:not-allowed}
@@ -69,6 +70,15 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:var(--grn);color:var(--grn)}
 .toast.err{border-color:var(--rd);color:var(--rd)}
+.letra-view{position:fixed;inset:0;z-index:60;background:#0f0f0f;display:none;flex-direction:column}
+.letra-view.show{display:flex}
+.letra-bar{padding:14px 20px;border-bottom:1px solid #2a2a2a}
+.letra-back{background:none;border:1.5px solid var(--gold);border-radius:50px;color:var(--gold);font-size:.9rem;font-weight:600;padding:10px 18px;cursor:pointer}
+.letra-back:active{background:var(--gold-soft)}
+#letraFrame{flex:1;width:100%;border:none;background:#0f0f0f}
+.q-letra{margin-left:auto;align-self:center;flex-shrink:0;background:transparent;border:1.5px solid var(--gold);border-radius:50px;color:var(--gold);font-size:.72rem;font-weight:600;letter-spacing:.5px;padding:6px 14px;cursor:pointer}
+.q-letra:active{background:var(--gold-soft)}
+.now-letra{margin-top:16px}
 </style>
 </head>
 <body>
@@ -83,6 +93,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
     <div class="now-name" id="nowName"></div>
     <div class="now-song" id="nowSong">O palco está livre — escolha sua música!</div>
     <div class="now-artist" id="nowArtist"></div>
+    <button type="button" class="q-letra now-letra" id="nowLetra" style="display:none">Letra</button>
   </section>
   <div class="search" id="searchBox">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -102,7 +113,10 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,-appl
   <label for="shName">Seu nome ou apelido (é assim que eu chamo no palco)</label>
   <input type="text" id="shName" maxlength="40" placeholder="Ex.: Ana, Tio Zé, galera da mesa 3…">
   <div class="count" id="shCount">0/40</div>
-  <a class="sh-letra" id="shLetra" href="#">Ver letra</a>
+  <button type="button" class="btn-letra" id="shLetraBtn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    Ver letra
+  </button>
   <button class="btn-go" id="shGo">Quero cantar! 🎤</button>
 </div>
 <div class="toast" id="toast"></div>
@@ -135,11 +149,14 @@ function render(){
     $('nowName').textContent='🎤 '+c.name;
     $('nowSong').textContent=c.t;
     $('nowArtist').textContent=c.a||'';
+    $('nowLetra').style.display='inline-block';
+    $('nowLetra').dataset.id=c.songId;
   }else{
     $('now').classList.add('empty');
     $('nowName').textContent='';
     $('nowSong').textContent='O palco está livre — escolha sua música!';
     $('nowArtist').textContent='';
+    $('nowLetra').style.display='none';
   }
   const fila=state.fila||[];
   $('qCount').textContent=fila.length?('esperando: '+fila.length):'';
@@ -154,6 +171,7 @@ function render(){
         +'<div class="q-info"><div class="q-name">'+esc(it.name)+'</div>'
         +'<div class="q-song">'+esc(it.t)+(it.a?' — '+esc(it.a):'')+'</div></div>'
         +(me?'<div class="me-tag">É VOCÊ ✨</div>':'')
+        +'<button type="button" class="q-letra" data-id="'+esc(it.songId)+'">Letra</button>'
         +'</div>';
     }).join('');
   }
@@ -187,7 +205,6 @@ function openSheet(s){
   chosen=s;
   $('shSong').textContent=s.t;
   $('shArtist').textContent=s.a||'';
-  $('shLetra').href='/letra/'+encodeURIComponent(s.id);
   shName.value=myName();
   updCount();
   $('mask').classList.add('show');
@@ -239,6 +256,27 @@ $('mask').addEventListener('click',closeSheet);
 shName.addEventListener('input',updCount);
 shName.addEventListener('keydown',(e)=>{if(e.key==='Enter') send();});
 $('shGo').addEventListener('click',send);
+function openLetra(id){
+  $('letraFrame').src='/letra/'+encodeURIComponent(id);
+  $('letraView').classList.add('show');
+}
+function closeLetra(){
+  $('letraView').classList.remove('show');
+  $('letraFrame').src='about:blank';
+}
+$('letraBack').addEventListener('click',closeLetra);
+$('shLetraBtn').addEventListener('click',()=>{if(chosen)openLetra(chosen.id);});
+$('letraFrame').addEventListener('load',()=>{
+  try{
+    const d=$('letraFrame').contentDocument;
+    if(!d) return;
+    d.querySelectorAll('a[href="/"]').forEach(a=>{const p=a.closest('p');(p||a).remove();});
+  }catch(e){}
+});
+$('queue').addEventListener('click',(e)=>{
+  const b=e.target.closest('.q-letra');
+  if(b) openLetra(b.dataset.id);
+});
 /* Toque fora do campo de busca (e fora dos resultados) retrai o teclado */
 document.addEventListener('pointerdown',(e)=>{
   if(e.target.closest('#searchBox')||e.target.closest('#results')) return;
@@ -260,5 +298,11 @@ es.onerror=()=>{
   $('conn').textContent='reconectando…';
 };
 </script>
+<div class="letra-view" id="letraView">
+  <div class="letra-bar">
+    <button type="button" class="letra-back" id="letraBack">← Voltar</button>
+  </div>
+  <iframe id="letraFrame" title="Letra da música"></iframe>
+</div>
 </body>
 </html>
