@@ -455,6 +455,85 @@ function adminAction(b) {
   return { ok: true };
 }
 
+/* ------------------------ LETRAS (Chordle) ------------------- */
+const LET_DIR = path.join(__dirname, 'letras');
+const LET_FILE = path.join(__dirname, 'letras.json');
+
+function escHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function letraKey(s) {
+  return String(s == null ? '' : s)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[\u2019\u2018]/g, "'").replace(/\(feat\.?[^)]*\)/gi, ' ')
+    .replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function findLetra(song) {
+  let idx = null;
+  try { idx = JSON.parse(fs.readFileSync(LET_FILE, 'utf8')); } catch (e) { return null; }
+  const kt = letraKey(song.t), ka = letraKey(song.a);
+  return (idx.byKey && idx.byKey[kt + '|' + ka]) || (idx.byTitle && idx.byTitle[kt]) || null;
+}
+function letraBody(raw, showChords) {
+  const lines = String(raw).replace(/\r\n?/g, '\n').split('\n');
+  const out = [];
+  for (let ln of lines) {
+    if (/^\s*\{.*\}\s*$/.test(ln)) continue;                       /* diretivas ChordPro */
+    if (/(\|--|[-\u2013\u2014]{3,}|____)/.test(ln) || /\[[^\]]*\|/.test(ln)) {
+      if (showChords) out.push('<pre class="tab">' + escHtml(ln) + '</pre>');
+      continue;                                                    /* tablatura */
+    }
+    const txt = ln.replace(/\[[^\]]*\]/g, '');
+    if (!showChords) {
+      if (!txt.trim() && /\[.+\]/.test(ln)) continue;              /* linha só de acordes */
+      ln = txt;
+    }
+    if (!ln.trim()) { out.push('<div class="sp"></div>'); continue; }
+    out.push('<div class="ln">' + escHtml(ln) + '</div>');
+  }
+  const clean = [];
+  out.forEach((el) => {
+    if (el === '<div class="sp"></div>' && clean[clean.length - 1] === '<div class="sp"></div>') return;
+    clean.push(el);
+  });
+  return clean.join('');
+}
+function letraPage(song, letra, showChords) {
+  let raw = '', meta = '';
+  try { raw = fs.readFileSync(path.join(LET_DIR, path.basename(letra.f)), 'utf8'); }
+  catch (e) { return '<p>Arquivo da letra não encontrado no servidor.</p>'; }
+  const mK = raw.match(/\{key:([^}]*)\}/i), mC = raw.match(/\{capo:([^}]*)\}/i);
+  if (mK) meta += 'Tom: ' + escHtml(mK[1].trim()) + (mC ? ' · Capotraste: ' + escHtml(mC[1].trim()) : '');
+  const togg = showChords ? '?' : '?cifra=1';
+  const toggTxt = showChords ? 'Esconder cifras' : 'Mostrar cifras';
+  return '<header><h1>' + escHtml(song.t) + '</h1><p class="art">' + escHtml(song.a || '') + '</p>'
+    + (meta ? '<p class="meta">' + meta + '</p>' : '')
+    + '<a class="tog" href="' + togg + '">' + toggTxt + '</a></header><main>' + letraBody(raw, showChords) + '</main>';
+}
+function handleLetra(req, res, rawId) {
+  let id = '';
+  try { id = decodeURIComponent(String(rawId || '').split('?')[0]); } catch (e) { id = ''; }
+  const song = songById(id);
+  const head = { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' };
+  const mini = (title, msg) => '<!DOCTYPE html><html lang="pt-BR"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + title + '</title></head><body style="background:#0f0f0f;color:#f5f5f5;font-family:system-ui,sans-serif;text-align:center;padding:40px"><h1 style="color:#d4a853">' + title + '</h1><p>' + msg + '</p><p><a style="color:#d4a853" href="/">← Voltar</a></p></body></html>';
+  if (!song) {
+    res.writeHead(404, head);
+    res.end(mini('Música não encontrada', 'Atualize a página e tente de novo.'));
+    return;
+  }
+  const letra = findLetra(song);
+  if (!letra) {
+    res.writeHead(200, head);
+    res.end(mini('Letra ainda não disponível', escHtml(song.t) + (song.a ? ' — ' + escHtml(song.a) : '')));
+    return;
+  }
+  const showChords = String(req.url || '').indexOf('cifra=1') !== -1;
+  res.writeHead(200, head);
+  res.end('<!DOCTYPE html><html lang="pt-BR"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + escHtml(song.t) + ' — letra</title><style>body{background:#0f0f0f;color:#f5f5f5;font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:28px 20px 60px;line-height:1.65;font-size:1.05rem}header{border-bottom:1px solid #2a2a2a;padding-bottom:14px;margin-bottom:18px}h1{font-family:Georgia,serif;color:#d4a853;font-size:1.5rem;margin:0 0 4px}.art{color:#a3a3a3;margin:0}.meta{color:#a3a3a3;font-size:.85rem;margin:6px 0 0}.tog{display:inline-block;margin-top:10px;color:#d4a853;font-size:.9rem}.ln{white-space:pre-wrap}.sp{height:1.1em}.tab{color:#a3a3a3;font-size:.75rem;overflow-x:auto;white-space:pre;margin:4px 0}main .ln:first-child{margin-top:0}</style></head><body>' + letraPage(song, letra, showChords) + '<p style="margin-top:30px"><a style="color:#d4a853" href="/">← Voltar</a></p></body></html>');
+}
+
 /* --------------------------- HTTP ---------------------------- */
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -551,6 +630,12 @@ const server = http.createServer((req, res) => {
       });
     });
     sendJson(res, 200, { port: PORT, ips: ips });
+    return;
+  }
+
+  // ---------- Letra da música (Chordle) ----------
+  if (route.indexOf('/letra/') === 0) {
+    handleLetra(req, res, route.slice(7));
     return;
   }
 
