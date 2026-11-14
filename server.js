@@ -476,6 +476,17 @@ function findLetra(song) {
   const kt = letraKey(song.t), ka = letraKey(song.a);
   return (idx.byKey && idx.byKey[kt + '|' + ka]) || (idx.byTitle && idx.byTitle[kt]) || null;
 }
+
+function letraIds() {
+  let idx = null;
+  try { idx = JSON.parse(fs.readFileSync(LET_FILE, 'utf8')); } catch (e) { return []; }
+  const ids = [];
+  catalog.forEach((song) => {
+    const kt = letraKey(song.t), ka = letraKey(song.a);
+    if ((idx.byKey && idx.byKey[kt + '|' + ka]) || (idx.byTitle && idx.byTitle[kt])) ids.push(song.id);
+  });
+  return ids;
+}
 function letraBody(raw, showChords) {
   const lines = String(raw).replace(/\r\n?/g, '\n').split('\n');
   const out = [];
@@ -614,6 +625,11 @@ const server = http.createServer((req, res) => {
   // ---------- APIs ----------
   if (route === '/api/catalogo') {
     sendJson(res, 200, catalog);
+    return;
+  }
+
+  if (route === '/api/letras') {
+    sendJson(res, 200, letraIds());
     return;
   }
 
