@@ -648,7 +648,7 @@
     "ano": "2004"
   },
   {
-    "musica": "Ilha, A",
+    "musica": "A Ilha",
     "artista": "Armandinho",
     "estilo": [
       "Reggae"
@@ -857,7 +857,7 @@
     "musica": "Campo Minado",
     "artista": "Bandaliera",
     "estilo": [
-      "MPB"
+      "Rock"
     ],
     "idioma": "Português",
     "ano": "1992"
@@ -1979,7 +1979,7 @@
     "ano": "1998"
   },
   {
-    "musica": "Amanhã colorido",
+    "musica": "O Amanhã colorido",
     "artista": "Cidadão Quem",
     "estilo": [
       "Rock"
@@ -3349,7 +3349,7 @@
     "ano": "2004"
   },
   {
-    "musica": "Ai, que saudade di ocê (com Vital Farias)",
+    "musica": "Ai, que saudade di ocê",
     "artista": "Elba Ramalho",
     "estilo": [
       "MPB",
@@ -3662,7 +3662,7 @@
     "ano": "1990"
   },
   {
-    "musica": "Ai qui Saudade d'ocê",
+    "musica": "Ai, que saudade di ocê",
     "artista": "Fagner",
     "estilo": [
       "MPB"
@@ -9928,13 +9928,13 @@
     "ano": "2001"
   },
   {
-    "musica": "Bitter Sweet Symphony",
-    "artista": "The Verve",
+    "musica": "Campo Minado",
+    "artista": "Alemão Ronaldo",
     "estilo": [
       "Rock"
     ],
-    "idioma": "Inglês",
-    "ano": "1997"
+    "idioma": "Português",
+    "ano": "1992"
   },
   {
     "musica": "Lucky Man",
@@ -12283,5 +12283,54 @@
     ],
     "idioma": "Inglês",
     "ano": "1997"
+  },
+  {
+    "musica": "Ainda gosto de vocë",
+    "artista": "Armandinho",
+    "estilo": [
+      "MPB",
+      "Pop"
+    ],
+    "idioma": "Português",
+    "ano": "2013"
+  },
+  {
+    "musica": "Ao fim de tudo",
+    "artista": "Duca Leindecker",
+    "estilo": [
+      "Rock",
+      "Pop"
+    ],
+    "idioma": "Português",
+    "ano": "2002"
+  },
+  {
+    "musica": "Apesar de você",
+    "artista": "Chico Buarque",
+    "estilo": [
+      "MPB",
+      "Samba",
+      "Bossa Nova"
+    ],
+    "idioma": "Português",
+    "ano": "1970"
+  },
+  {
+    "musica": "Bitter Sweet Symphony",
+    "artista": "The Verve",
+    "estilo": [
+      "Rock"
+    ],
+    "idioma": "Inglês",
+    "ano": "1997"
+  },
+  {
+    "musica": "A menina dança",
+    "artista": "Marisa Monte",
+    "estilo": [
+      "MPB"
+    ],
+    "idioma": "Português",
+    "ano": "1996"
   }
 ]
